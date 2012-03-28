@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, QCMActivity!</string>
-    <string name="app_name">QCM</string>
+    <string name="menu_connection"><font fgcolor="#000">Connect</font></string>
+    <string name="app_name">QuiZzz</string>
 
 </resources>

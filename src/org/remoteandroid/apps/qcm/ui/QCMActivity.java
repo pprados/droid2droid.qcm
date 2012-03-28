@@ -1,10 +1,13 @@
-package org.remoteandroid.apps.qcm;
+package org.remoteandroid.apps.qcm.ui;
 
-import android.app.Activity;
+
+import org.remoteandroid.apps.qcm.R;
+
 import android.os.Bundle;
 
-public class QCMActivity extends Activity {
-    /** Called when the activity is first created. */
+import com.actionbarsherlock.app.SherlockActivity;
+
+public class QCMActivity extends SherlockActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
