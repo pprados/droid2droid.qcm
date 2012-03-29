@@ -13,6 +13,17 @@
     <string name="title_answer">Answer</string>
     <string name="title_score">Score</string>
     <string name="button_play">Play</string>
-    <string name="instructiontext">Please connect to remote device before start playing.</string>
+    <string name="instructiontext">
+        <h4>Instructions</h4>
+		<p>Before start playing you should            
+		    <ul>
+                <li>Connect to remote device to suscribe</li>
+                <li>Enter a nickname that will identify you to the remte device</li>
+                <li>Press "Play QuiZzz" button to start playing</li>
+                <li>Enjoy !!!</li>
+            </ul>
+		</p>
+
+	</string>
 
 </resources>

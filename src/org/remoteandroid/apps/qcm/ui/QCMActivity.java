@@ -4,8 +4,11 @@ import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -14,12 +17,17 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class QCMActivity extends SherlockActivity
 {
+	private TextView mInstructions;
 	private static final int 	REQUEST_CONNECT_CODE=1;
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		mInstructions = (TextView)findViewById(R.id.instructions);
+		Resources res = getResources();
+		String instructions = String.format(res.getString(R.string.instructiontext)); 
+		mInstructions.setText(Html.fromHtml(instructions));
 	}
 	
 	@Override
