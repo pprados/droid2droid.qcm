@@ -3,6 +3,73 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
+
+    <GridLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="10dip"
+        android:alignmentMode="alignBounds"
+        android:columnCount="2"
+        android:columnOrderPreserved="false"
+        android:useDefaultMargins="true"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_column="0"
+            android:layout_row="0"
+            android:text="@string/label_status"
+            android:layout_columnSpan="1"
+            style="@style/titleStyle" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="113dp"
+            android:layout_column="1"
+            android:layout_columnSpan="1"
+            android:layout_row="0"
+            android:text="@string/status_disconnected" 
+            style="@style/disconnectStyle"/>
+
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:text="@string/label_pseudo"
+            style="@style/titleStyle" />
+        
+        <EditText
+            android:id="@+id/edt_pseudo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:hint="@string/hint_pseudo"
+            android:maxLength="15"
+            android:maxLines="1"
+            android:layout_row="1"
+            style="@style/editTextStyle"/>
+        <TextView android:id="@+id/instructions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:layout_columnSpan="2"
+            android:text="@string/instructiontext"
+            style="@style/simpleTextStyle"
+            android:layout_gravity="center"
+            />
+
+    </GridLayout>
     
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_margin="10dip"
+        android:layout_weight="5">
+        <Button android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_play"/>
+   
+        
+    </LinearLayout>
 
 </LinearLayout>
