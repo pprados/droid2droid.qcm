@@ -24,5 +24,8 @@
 	<string name="title_master">Master : </string>
 	<string name="title_player_ready">Players ready</string>
 	<string name="title_click_qrcode">Click to the QRCode to zoom</string>
-
+	<string name="no_master_game">  No master to start the game. Please scan the code to connect first </string>
+	<string name="title_qrcode_dialog"> QR Code </string>
+	<string name="qrcode_button_text"> Go Back </string>
+		
 </resources>
