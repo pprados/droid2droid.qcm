@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="5dip">
+        <LinearLayout android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+			<TextView android:id="@+id/click_to_zoom"
+			    android:layout_height="wrap_content"
+			    android:layout_width="fill_parent"
+			    android:text="@string/title_click_qrcode"
+			    style="@style/simpleTextStyle"
+			    android:gravity="center"/>
+            <ImageButton android:id="@+id/qrcodeButton"
+	            android:layout_width="150dip"
+	            android:layout_height="150dip"
+	            android:layout_gravity="center_horizontal"
+	            android:layout_margin="10dip"/>
+        </LinearLayout>
+        <LinearLayout android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:orientation="horizontal">
+	        <TextView android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/title_master"
+	            style="@style/titleStyle"/>            
+            <TextView android:id="@+id/gamemastername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/simpleTextStyle"/>
+        </LinearLayout>
+        <TextView android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:text="@string/title_player_ready"
+            style="@style/simpleTextStyle"
+            android:gravity="center"/>
+    </LinearLayout>
+    <ListView android:id="@android:id/list" 
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        
+    </ListView>
+    
+
+</LinearLayout>

@@ -12,18 +12,17 @@
     <string name="title_question">Question</string>
     <string name="title_answer">Answer</string>
     <string name="title_score">Score</string>
-    <string name="button_play">Play</string>
-    <string name="instructiontext">
-        <h4>Instructions</h4>
-		<p>Before start playing you should            
-		    <ul>
-                <li>Connect to remote device to suscribe</li>
-                <li>Enter a nickname that will identify you to the remte device</li>
-                <li>Press "Play QuiZzz" button to start playing</li>
-                <li>Enjoy !!!</li>
-            </ul>
-		</p>
-
+    <string name="button_play">Play QuiZzz</string>
+    <string name="instruction_text">
+       Instructions \n \n
+		Before start playing you should \n            
+		    - Connect to remote device to suscribe \n
+            - Enter a nickname that will identify you to the remte device \n
+            - Press "Play QuiZzz" button to start playing \n
+            - Enjoy !!!
 	</string>
+	<string name="title_master">Master : </string>
+	<string name="title_player_ready">Players ready</string>
+	<string name="title_click_qrcode">Click to the QRCode to zoom</string>
 
 </resources>
