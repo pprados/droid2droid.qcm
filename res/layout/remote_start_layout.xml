@@ -3,49 +3,65 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    <LinearLayout android:layout_width="fill_parent"
+
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="5dip">
-        <LinearLayout android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-			<TextView android:id="@+id/click_to_zoom"
-			    android:layout_height="wrap_content"
-			    android:layout_width="fill_parent"
-			    android:text="@string/title_click_qrcode"
-			    style="@style/titleStyle"/>
-            <ImageButton android:id="@+id/qrcodeButton"
-	            android:layout_width="100dip"
-	            android:layout_height="100dip"
-	            android:layout_gravity="center_horizontal"
-	            android:layout_margin="10dip"/>
-        </LinearLayout>
-        <LinearLayout android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:orientation="vertical" >
+
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:orientation="horizontal"
-            android:layout_marginBottom="5dip">
-	        <TextView android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:text="@string/title_master"
-	            style="@style/titleStyle"/>            
-            <TextView android:id="@+id/master_game"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/click_to_zoom"
+                style="@style/titleStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/title_click_qrcode" />
+
+            <ImageButton
+                android:id="@+id/qrcodeButton"
+                android:layout_width="100dip"
+                android:layout_height="100dip"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dip" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dip"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="@style/titleStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/title_master" />
+
+            <TextView
+                android:id="@+id/master_game"
                 style="@style/simpleTextStyle"
-                android:text="@string/no_master_game"
-                android:layout_marginLeft="5dip"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dip"
+                android:text="@string/no_master_game" />
         </LinearLayout>
-        <TextView android:layout_height="wrap_content"
+
+        <TextView
+            style="@style/titleStyle"
             android:layout_width="fill_parent"
-            android:text="@string/title_player_ready"
-            style="@style/titleStyle"/>
+            android:layout_height="wrap_content"
+            android:text="@string/title_player_ready" />
     </LinearLayout>
-    <ListView android:id="@+id/listView" 
+
+    <ListView
+        android:id="@+id/listView"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-        
+        android:layout_height="fill_parent" >
     </ListView>
-    
 
 </LinearLayout>
