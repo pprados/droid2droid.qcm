@@ -25,4 +25,11 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 		
 	}
 
+	@Override
+	public void play() throws RemoteException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

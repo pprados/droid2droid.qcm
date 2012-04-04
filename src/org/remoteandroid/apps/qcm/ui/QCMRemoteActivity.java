@@ -2,12 +2,11 @@ package org.remoteandroid.apps.qcm.ui;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
-
 import android.app.Dialog;
-import android.content.Context;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -18,14 +17,23 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 
 public class QCMRemoteActivity extends SherlockListActivity implements OnClickListener
 {
+	public static final String	REGISTER		= "org.remoteandroid.apps.qcm.REGISTER";
 	private static final int MINI = 250;
 	private static final int MAXI = 700;
 	private ImageButton mQrcodeButton;
+	private ListView list;
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		registerReceiver(mReceiver, new IntentFilter(REGISTER));
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -34,8 +42,23 @@ public class QCMRemoteActivity extends SherlockListActivity implements OnClickLi
 		mQrcodeButton = (ImageButton)findViewById(R.id.qrcodeButton);
 		mQrcodeButton.setOnClickListener(this);
 		mQrcodeButton.setImageBitmap(getOwnQRCodeFromRA(MINI));
+		list = (ListView)findViewById(R.id.listView);
 		
 	}
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		unregisterReceiver(mReceiver);
+	}
+	private BroadcastReceiver mReceiver = new BroadcastReceiver()
+	{
+		public void onReceive(android.content.Context context, android.content.Intent intent) 
+		{
+			
+		};
+	};
+	
 	private Bitmap getOwnQRCodeFromRA(final int size )
 	{
 		Bitmap scaBitmap = null;
@@ -75,6 +98,8 @@ public class QCMRemoteActivity extends SherlockListActivity implements OnClickLi
 			ImageView image = (ImageView)dialog.findViewById(R.id.qrcode_dialog_image);
 			image.setImageBitmap(getOwnQRCodeFromRA(MAXI));
 			Button dialog_quit_button = (Button)dialog.findViewById(R.id.qrcode_dialog_quit_button);
+			dialog.setCancelable(true);
+			dialog.setCanceledOnTouchOutside(false);
 			dialog.show();
 			dialog_quit_button.setOnClickListener(new OnClickListener()
 			{

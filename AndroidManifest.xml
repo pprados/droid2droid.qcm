@@ -39,6 +39,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".services.QCMService"></service>
+        <service android:name=".remote.RemoteQCMService">
+            <intent-filter >
+                <action android:name="org.remoteandroid.apps.QCM.RemoteService"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

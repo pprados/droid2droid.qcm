@@ -41,7 +41,7 @@
             android:text="@string/title_player_ready"
             style="@style/titleStyle"/>
     </LinearLayout>
-    <ListView android:id="@android:id/list" 
+    <ListView android:id="@+id/listView" 
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
         
