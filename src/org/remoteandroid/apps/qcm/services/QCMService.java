@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.remoteandroid.ListRemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroid;
 import org.remoteandroid.RemoteAndroid.PublishListener;
@@ -12,7 +11,6 @@ import org.remoteandroid.RemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
 import org.remoteandroid.apps.qcm.ui.QCMRemoteActivity;
-
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,6 +27,7 @@ public class QCMService extends Service
 	public Map<String, RemoteQCM> mPlayers = Collections.synchronizedMap(new HashMap<String, RemoteQCM>());
 
 	ListRemoteAndroidInfo mAndroids;
+	public static QCMService sMe;
 
 	public static RemoteAndroidManager mManager;
 
@@ -36,10 +35,58 @@ public class QCMService extends Service
 
 	public static final String ACTION_ADD_DEVICE = "org.remoteandroid.apps.qcm.ADD_DEVICE";
 
-	private Mode mState = Mode.MASTER_CONNECT;
+	private Mode mState = Mode.STOP;
 
-	private enum Mode {
-		CONNECT, PLAY, WAIT, MASTER_CONNECT,
+	private enum Mode 
+	{
+		CONNECT, PLAY, WAIT, STOP,
+	}
+	
+	
+	@Override
+	public void onCreate()
+	{
+
+		super.onCreate();
+		if (sMe!=null) return;
+		Log.d("service","Service onCreate");
+		sMe=this;
+		RemoteAndroidManager.bindManager(this, new RemoteAndroidManager.ManagerListener()
+		{
+			
+			@Override
+			public void unbind(RemoteAndroidManager manager)
+			{
+				mManager=null;
+			}
+			
+			@Override
+			public void bind(RemoteAndroidManager manager)
+			{
+				// TODO Auto-generated method stub
+				mManager=manager;
+				mAndroids = mManager.newDiscoveredAndroid(new ListRemoteAndroidInfo.DiscoverListener()
+				{
+					@Override
+					public void onDiscover(final RemoteAndroidInfo remoteAndroidInfo, boolean replace)
+					{
+						QCMService.this.onDiscover(remoteAndroidInfo,replace);
+					}
+
+					@Override
+					public void onDiscoverStart()
+					{
+					}
+
+					@Override
+					public void onDiscoverStop()
+					{
+					}
+				});
+				
+			}
+		});
+	
 	}
 
 	@Override
@@ -64,188 +111,124 @@ public class QCMService extends Service
 		startConnection(remoteAndroidInfo);
 
 	}
-
-	private void startConnection(final RemoteAndroidInfo remoteAndroidInfo)
+	
+	private void startConnection(final RemoteAndroidInfo info)
 	{
-		Log.d(
-			"QCM", "start connection with " + remoteAndroidInfo.getName());
-		new Thread(new Runnable()
+		new Thread( new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				for (String uri : remoteAndroidInfo.getUris())
+				for(String uri : info.getUris())
 				{
-
-					if (connect(
-						remoteAndroidInfo, uri, true))
-					{
-						// if (mState == Mode.MASTER_CONNECT)
-						// {
-						// doVote(mPlayers.get(uri));
-						// }
-						break;
-					}
+					connect(info, uri);
 				}
 			}
 		}).start();
 	}
-
-	private boolean connect(final RemoteAndroidInfo info, final String uri, final boolean block)
+	
+	private void connect (final RemoteAndroidInfo info,final String uri)
 	{
-		if (info.getUris().length == 0)
-			return false;
-		class Result
+		if (info.getUris().length==0)
+			return ;
+		mManager.bindRemoteAndroid(new Intent(Intent.ACTION_MAIN, Uri.parse(uri)), new ServiceConnection()
 		{
-			volatile boolean rc;
-		}
-		final Result result = new Result();
-
-		mManager.bindRemoteAndroid(
-			new Intent(Intent.ACTION_MAIN, Uri.parse(uri)), new ServiceConnection()
+			
+			@Override
+			public void onServiceDisconnected(ComponentName name)
 			{
-				@Override
-				public void onServiceDisconnected(ComponentName name)
-				{
-					mPlayers.remove(uri);
-					mAndroids.remove(info);
-					if (block)
-					{
-						synchronized (QCMService.this)
-						{
-							QCMService.this.notify();
-						}
-					}
-				}
-
-				@Override
-				public void onServiceConnected(ComponentName name, IBinder service)
-				{
-					final RemoteAndroid rA = (RemoteAndroid) service;
-					rA.setExecuteTimeout(60 * 60000L);
-					try
-					{
-						rA.pushMe(
-							getApplicationContext(), new PublishListener()
-							{
-								@Override
-								public void onProgress(int progress)
-								{
-									// setStatus("Progress..."+progress/100+"%");
-								}
-
-								@Override
-								public void onFinish(int status)
-								{
-									if (status == -2)
-										Toast.makeText(
-											QCMService.this, "Device " + rA.getInfos().getName()
-													+ " accept only applications from market.", Toast.LENGTH_LONG);
-									else if (status == -1)
-									{
-										// Refused
-										mPlayers.remove(uri);
-										mAndroids.remove(info);
-									}
-									else if (status >= 0)
-									{
-										rA.bindService(
-											new Intent("org.remoteandroid.apps.QCM.RemoteService"),
-											new ServiceConnection()
-											{
-												RemoteQCM qcm;
-
-												@Override
-												public void onServiceDisconnected(ComponentName name)
-												{
-													qcm = null;
-												}
-
-												@Override
-												public void onServiceConnected(ComponentName name, IBinder service)
-												{
-													qcm = RemoteQCM.Stub.asInterface(service);
-													mPlayers.put(
-														uri, qcm);
-													if (block)
-													{
-														result.rc = true;
-														synchronized (QCMService.this)
-														{
-															QCMService.this.notify();
-														}
-													}
-													try
-													{
-														String nickname = qcm.suscribe();
-														Intent intent = new Intent(QCMRemoteActivity.SUSCRIBE);
-														if (mState == Mode.MASTER_CONNECT)
-														{
-															mState = Mode.CONNECT;
-															intent.putExtra(
-																"master", true);
-														}
-
-														intent.putExtra(
-															"master", false);
-														intent.putExtra(
-															"nickname", nickname);
-														sendBroadcast(intent);
-
-													}
-													catch (RemoteException e)
-													{
-														e.printStackTrace();
-													}
-												}
-											}, Context.BIND_AUTO_CREATE);
-									}
-								}
-
-								@Override
-								public void onError(Throwable e)
-								{
-									mPlayers.remove(uri);
-									mAndroids.remove(info);
-								}
-
-								@Override
-								public boolean askIsPushApk()
-								{
-									return true;
-								}
-							}, 0 /*
-								 * (SelectActivity.DEBUG) ?
-								 * RemoteAndroid.INSTALL_REPLACE_EXISTING : 0
-								 */, 60000);
-					}
-					catch (RemoteException e)
-					{
-						e.printStackTrace();
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}, 0);
-		if (block)
-		{
-			synchronized (this)
+				mPlayers.remove(uri);
+				mAndroids.remove(info);
+			}
+			
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder service)
 			{
+				final RemoteAndroid rA = (RemoteAndroid)service;
+				rA.setExecuteTimeout(60*60000L);
 				try
 				{
-					wait();
-					return result.rc;
+					rA.pushMe(getApplicationContext(), new PublishListener()
+					{
+						
+						@Override
+						public void onProgress(int progress)
+						{
+							//setStatus("Progress..."+progress/100+"%");
+							
+						}
+						
+						@Override
+						public void onFinish(int status)
+						{
+							if(status == 2)
+							{
+								Toast.makeText(QCMService.this, "Device "+rA.getInfos().getName()+ " accept only applications from market.", Toast.LENGTH_SHORT).show();
+							}
+							else if(status == -1)
+							{
+								//Connection refused
+							}
+							else if (status >= 0)
+							{
+								rA.bindService(new Intent("org.remoteandroid.apps.QCM.RemoteService"), new ServiceConnection()
+								{
+									RemoteQCM player;
+									@Override
+									public void onServiceDisconnected(ComponentName name)
+									{
+										player=null;
+										
+									}
+									
+									@Override
+									public void onServiceConnected(ComponentName name, IBinder service)
+									{
+										player = RemoteQCM.Stub.asInterface(service);
+										mPlayers.put(uri, player);
+										try
+										{
+											player.subscribe();
+										}
+										catch (RemoteException e)
+										{
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+									}
+								}, Context.BIND_AUTO_CREATE);
+							}
+							
+						}
+						
+						@Override
+						public void onError(Throwable e)
+						{
+							mPlayers.remove(uri);
+							mAndroids.remove(info);
+							
+						}
+						
+						@Override
+						public boolean askIsPushApk()
+						{
+							return true;
+						}
+					}, 0, 60000);
 				}
-				catch (InterruptedException e)
+				catch (RemoteException e)
 				{
-					return false; // Waiting correct
-				} // FIXME
+					e.printStackTrace();
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+				
 			}
-		}
-		return false;
+		}, 60000);
 	}
+	
 
 	@Override
 	public IBinder onBind(Intent intent)

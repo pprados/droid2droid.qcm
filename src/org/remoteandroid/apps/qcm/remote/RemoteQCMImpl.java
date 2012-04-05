@@ -43,17 +43,6 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 
 	}
 
-	private void postStartActivity(final Intent intent)
-	{
-		mHandler.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				mContext.startActivity(intent);
-			}
-		});
-	}
 
 	private static String getResult()
 	{
@@ -82,11 +71,22 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	}
 
 	@Override
-	public String suscribe() throws RemoteException
+	public String subscribe() throws RemoteException
 	{
 		postStartActivity(new Intent(this.mContext, SuscribeActivity.class));
 		return getResult();
 
+	}
+	private void postStartActivity(final Intent intent)
+	{
+		mHandler.post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				mContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_NEW_TASK));
+			}
+		});
 	}
 
 }

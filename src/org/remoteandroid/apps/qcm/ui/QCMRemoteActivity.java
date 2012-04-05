@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
+import org.remoteandroid.apps.qcm.services.QCMService;
 
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,18 +20,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.app.SherlockActivity;
 
-public class QCMRemoteActivity extends SherlockListActivity implements OnClickListener
+public class QCMRemoteActivity extends SherlockActivity implements OnClickListener
 {
 	public static final String SUSCRIBE = "org.remoteandroid.apps.qcm.REGISTER";
 
-	private static final int MINI = 250;
+	private static final int MINI = 200;
 
 	private static final int MAXI = 700;
 
@@ -38,6 +41,7 @@ public class QCMRemoteActivity extends SherlockListActivity implements OnClickLi
 	private ListView list;
 
 	private List<String> players = new ArrayList<String>();
+	ArrayAdapter<String> mAdapter;
 
 	@Override
 	protected void onResume()
@@ -56,6 +60,9 @@ public class QCMRemoteActivity extends SherlockListActivity implements OnClickLi
 		mQrcodeButton.setOnClickListener(this);
 		mQrcodeButton.setImageBitmap(getOwnQRCodeFromRA(MINI));
 		list = (ListView) findViewById(R.id.listView);
+		mAdapter = new ArrayAdapter<String>(QCMRemoteActivity.this, android.R.layout.simple_list_item_1,android.R.id.text1, players );
+		list.setAdapter(mAdapter);
+		startService(new Intent(this, QCMService.class));
 
 	}
 
@@ -72,9 +79,8 @@ public class QCMRemoteActivity extends SherlockListActivity implements OnClickLi
 		{
 			String nickname = intent.getExtras().getString(
 				"nickname");
-			boolean master = intent.getExtras().getBoolean(
-				"master");
 			players.add(nickname);
+			mAdapter.notifyDataSetChanged();
 		};
 	};
 
@@ -110,8 +116,6 @@ public class QCMRemoteActivity extends SherlockListActivity implements OnClickLi
 	@Override
 	public void onClick(View view)
 	{
-		Log.d(
-			"TAG", "HERE");
 		if (view == mQrcodeButton)
 		{
 			final Dialog dialog = new Dialog(QCMRemoteActivity.this);

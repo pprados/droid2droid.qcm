@@ -4,6 +4,6 @@ interface RemoteQCM
 	void exit();
 	void standby();
 	void play();
-	String suscribe();
+	String subscribe();
 	
 }
