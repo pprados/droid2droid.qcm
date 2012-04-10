@@ -13,6 +13,7 @@
     <string name="title_answer">Answer</string>
     <string name="title_score">Score</string>
     <string name="button_subscribe">Subscribe</string>
+    <string name="button_play">Start playing QuiZzz</string>
     <string name="instruction_text">
        Instructions \n \n
 		Before start playing you should \n            
@@ -26,5 +27,6 @@
 	<string name="no_master_game">  No master to start the game. Please scan the code to connect first </string>
 	<string name="title_qrcode_dialog"> QR Code </string>
 	<string name="qrcode_button_text"> Go Back </string>
+	<string name="wait"> Waiting the master will start the game </string>
 		
 </resources>

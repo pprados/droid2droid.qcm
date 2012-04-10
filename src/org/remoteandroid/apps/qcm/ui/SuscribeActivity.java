@@ -46,6 +46,7 @@ public class SuscribeActivity extends SherlockActivity implements OnClickListene
 			           public void onClick(DialogInterface dialog, int id) 
 			           {
 			        	  RemoteQCMImpl.postNickname(nickname.getText().toString());
+			        	  finish();
 			           }
 			       })
 			       .setNegativeButton("No", new DialogInterface.OnClickListener() 

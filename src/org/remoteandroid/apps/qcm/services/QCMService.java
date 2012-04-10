@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.remoteandroid.ListRemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroid;
 import org.remoteandroid.RemoteAndroid.PublishListener;
@@ -34,6 +36,7 @@ public class QCMService extends Service
 	public static final String TAG = "QCM Service";
 
 	public static final String ACTION_SUSCRIBE = "org.remoteandroid.apps.qcm.SUSCRIBE_TO_REMOTE";
+	private AtomicInteger mPlayersNumbers = new AtomicInteger(0);
 
 	private Mode mState = Mode.STOP;
 
@@ -96,21 +99,6 @@ public class QCMService extends Service
 		Log.i(TAG, "Start Command " + action);
 		if(ACTION_SUSCRIBE.equals(action))
 		{
-//			String nickname = intent.getStringExtra("nickname");
-////     	   Intent intent = new Intent("org.remoteandroid.apps.qcm.REGISTER");
-////     	   intent.putExtra("nickname", nickname.getText().toString());
-//			String uri = intent.getStringExtra("uri");
-//			RemoteQCM player = mPlayers.get(uri);
-//			try
-//			{
-//				player.finishSubscribe(nickname);
-//			}
-//			catch (RemoteException e)
-//			{
-//				e.printStackTrace();
-//			}
-//			
-//     	   sendBroadcast(new Intent(QCMRemoteActivity.REGISTER).putExtra("nickname", nickname));
 		}
 		return 0;
 	}
@@ -140,6 +128,7 @@ public class QCMService extends Service
 				{
 					if(connect(info, uri, true))
 					{
+						mPlayersNumbers.incrementAndGet();
 						RemoteQCM player = mPlayers.get(uri);
 						try
 						{
@@ -149,6 +138,12 @@ public class QCMService extends Service
 								Intent intent = new Intent(QCMRemoteActivity.REGISTER);
 								intent.putExtra("nickname", nickname);
 								sendBroadcast(intent);
+								int number = mPlayersNumbers.get();
+								if(player.starPlay(number))
+								{
+									Log.d("TAG","Master start the game");
+									startGame();
+								}
 							}
 						}
 						catch (RemoteException e)
@@ -159,6 +154,11 @@ public class QCMService extends Service
 				}
 			}
 		}).start();
+	}
+	
+	public void startGame()
+	{
+		
 	}
 	
 	private boolean connect (final RemoteAndroidInfo info,final String uri, final boolean block)

@@ -1,6 +1,8 @@
 package org.remoteandroid.apps.qcm.remote;
 
+import org.remoteandroid.apps.qcm.ui.MasterActivity;
 import org.remoteandroid.apps.qcm.ui.SuscribeActivity;
+import org.remoteandroid.apps.qcm.ui.WaitingActivity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	private Handler mHandler = new Handler();
 //	public static long time = 60000L;
 	private static String playerName;
+	private static boolean startValue;
 
 	public RemoteQCMImpl(Context context)
 	{
@@ -61,6 +64,47 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 			{
 				return null;
 			}
+		}
+	}
+	
+	public static void postStartGame(boolean value)
+	{
+		synchronized (sLock)
+		{
+			startValue = value;
+			sLock.notify();
+		}
+	}
+
+	private static boolean getStartGame()
+	{
+		synchronized (sLock)
+		{
+			try
+			{
+				sLock.wait();
+				return startValue;
+
+			}
+			catch (InterruptedException e)
+			{
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public boolean starPlay(int number) throws RemoteException
+	{
+		if(number==1)
+		{
+			postStartActivity(new Intent(this.mContext, MasterActivity.class));
+			return getStartGame();
+		}
+		else 
+		{
+			postStartActivity(new Intent(this.mContext, WaitingActivity.class));
+			return false;
 		}
 	}
 
