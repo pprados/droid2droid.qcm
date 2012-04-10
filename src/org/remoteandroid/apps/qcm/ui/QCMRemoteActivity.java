@@ -25,12 +25,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
 public class QCMRemoteActivity extends SherlockActivity implements OnClickListener
 {
-	public static final String SUSCRIBE = "org.remoteandroid.apps.qcm.REGISTER";
+	public static final String REGISTER = "org.remoteandroid.apps.qcm.REGISTER";
 
 	private static final int MINI = 200;
 
@@ -39,16 +40,16 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 	private ImageButton mQrcodeButton;
 
 	private ListView list;
-
+	
 	private List<String> players = new ArrayList<String>();
 	ArrayAdapter<String> mAdapter;
+	private TextView master_name;
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		registerReceiver(
-			mReceiver, new IntentFilter(SUSCRIBE));
+		registerReceiver(mReceiver, new IntentFilter(REGISTER));
 	}
 
 	@Override
@@ -59,10 +60,12 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		mQrcodeButton = (ImageButton) findViewById(R.id.qrcodeButton);
 		mQrcodeButton.setOnClickListener(this);
 		mQrcodeButton.setImageBitmap(getOwnQRCodeFromRA(MINI));
+		master_name = (TextView)findViewById(R.id.master_game);
 		list = (ListView) findViewById(R.id.listView);
 		mAdapter = new ArrayAdapter<String>(QCMRemoteActivity.this, android.R.layout.simple_list_item_1,android.R.id.text1, players );
 		list.setAdapter(mAdapter);
 		startService(new Intent(this, QCMService.class));
+		Log.d("TAG", "After the service");
 
 	}
 
@@ -77,10 +80,11 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 	{
 		public void onReceive(android.content.Context context, android.content.Intent intent)
 		{
-			String nickname = intent.getExtras().getString(
-				"nickname");
+			String nickname = intent.getExtras().getString("nickname");
 			players.add(nickname);
 			mAdapter.notifyDataSetChanged();
+			if(players.size() == 1)
+				master_name.setText(nickname);
 		};
 	};
 

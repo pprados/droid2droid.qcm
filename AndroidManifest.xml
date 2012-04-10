@@ -44,7 +44,9 @@
             </intent-filter>
         </activity>
         <service android:name=".services.QCMService">
-            
+            <intent-filter >
+                <action android:name="org.remoteandroid.apps.qcm.SUSCRIBE_TO_REMOTE"/>
+            </intent-filter>
         </service>
         <service android:name=".remote.RemoteQCMService">
             <intent-filter >

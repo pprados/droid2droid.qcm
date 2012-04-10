@@ -33,7 +33,7 @@ public class QCMService extends Service
 
 	public static final String TAG = "QCM Service";
 
-	public static final String ACTION_ADD_DEVICE = "org.remoteandroid.apps.qcm.ADD_DEVICE";
+	public static final String ACTION_SUSCRIBE = "org.remoteandroid.apps.qcm.SUSCRIBE_TO_REMOTE";
 
 	private Mode mState = Mode.STOP;
 
@@ -93,8 +93,25 @@ public class QCMService extends Service
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		String action = intent.getAction();
-		Log.i(
-			TAG, "Start Command " + action);
+		Log.i(TAG, "Start Command " + action);
+		if(ACTION_SUSCRIBE.equals(action))
+		{
+//			String nickname = intent.getStringExtra("nickname");
+////     	   Intent intent = new Intent("org.remoteandroid.apps.qcm.REGISTER");
+////     	   intent.putExtra("nickname", nickname.getText().toString());
+//			String uri = intent.getStringExtra("uri");
+//			RemoteQCM player = mPlayers.get(uri);
+//			try
+//			{
+//				player.finishSubscribe(nickname);
+//			}
+//			catch (RemoteException e)
+//			{
+//				e.printStackTrace();
+//			}
+//			
+//     	   sendBroadcast(new Intent(QCMRemoteActivity.REGISTER).putExtra("nickname", nickname));
+		}
 		return 0;
 	}
 
@@ -121,16 +138,38 @@ public class QCMService extends Service
 			{
 				for(String uri : info.getUris())
 				{
-					connect(info, uri);
+					if(connect(info, uri, true))
+					{
+						RemoteQCM player = mPlayers.get(uri);
+						try
+						{
+							String nickname = player.subscribe();
+							if(nickname!=null)
+							{
+								Intent intent = new Intent(QCMRemoteActivity.REGISTER);
+								intent.putExtra("nickname", nickname);
+								sendBroadcast(intent);
+							}
+						}
+						catch (RemoteException e)
+						{
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 		}).start();
 	}
 	
-	private void connect (final RemoteAndroidInfo info,final String uri)
+	private boolean connect (final RemoteAndroidInfo info,final String uri, final boolean block)
 	{
 		if (info.getUris().length==0)
-			return ;
+			return false;
+		class Result
+		{
+			volatile boolean rc; 
+		}
+		final Result result = new Result();
 		mManager.bindRemoteAndroid(new Intent(Intent.ACTION_MAIN, Uri.parse(uri)), new ServiceConnection()
 		{
 			
@@ -139,6 +178,13 @@ public class QCMService extends Service
 			{
 				mPlayers.remove(uri);
 				mAndroids.remove(info);
+				if(block)
+				{
+					synchronized (QCMService.this)
+					{
+						QCMService.this.notify();
+					}
+				}
 			}
 			
 			@Override
@@ -186,14 +232,13 @@ public class QCMService extends Service
 									{
 										player = RemoteQCM.Stub.asInterface(service);
 										mPlayers.put(uri, player);
-										try
+										if(block)
 										{
-											player.subscribe();
-										}
-										catch (RemoteException e)
-										{
-											// TODO Auto-generated catch block
-											e.printStackTrace();
+											result.rc = true;
+											synchronized (QCMService.this)
+											{
+												QCMService.this.notify();
+											}
 										}
 									}
 								}, Context.BIND_AUTO_CREATE);
@@ -226,7 +271,23 @@ public class QCMService extends Service
 				}
 				
 			}
-		}, 60000);
+		}, 0);
+		if(block)
+		{
+			synchronized (this)
+			{
+				try
+				{
+					wait();
+					return result.rc;
+				}
+				catch (InterruptedException e)
+				{
+					return false;
+				}
+			}
+		}
+		return false;
 	}
 	
 

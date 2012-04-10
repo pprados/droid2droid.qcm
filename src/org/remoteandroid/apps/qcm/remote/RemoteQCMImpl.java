@@ -10,12 +10,10 @@ import android.os.RemoteException;
 public class RemoteQCMImpl extends RemoteQCM.Stub
 {
 	private Context mContext;
-
+	private static Object	sLock		= new Object();
 	private Handler mHandler = new Handler();
-
-	private static Object sLock = new Object();
-
-	private static String playerName = null;
+//	public static long time = 60000L;
+	private static String playerName;
 
 	public RemoteQCMImpl(Context context)
 	{
@@ -23,28 +21,33 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	}
 
 	@Override
-	public void exit() throws RemoteException
+	public String subscribe() throws RemoteException
 	{
-		// TODO Auto-generated method stub
+		postStartActivity(new Intent(this.mContext, SuscribeActivity.class));
+		return getNickname();
 
 	}
-
-	@Override
-	public void standby() throws RemoteException
+	private void postStartActivity(final Intent intent)
 	{
-		// TODO Auto-generated method stub
-
+		mHandler.post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				mContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_NEW_TASK));
+			}
+		});
+	}
+	public static void postNickname(String nickname)
+	{
+		synchronized (sLock)
+		{
+			playerName = nickname;
+			sLock.notify();
+		}
 	}
 
-	@Override
-	public void play() throws RemoteException
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-
-	private static String getResult()
+	private static String getNickname()
 	{
 		synchronized (sLock)
 		{
@@ -61,32 +64,5 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 		}
 	}
 
-	public static void postResult(String name)
-	{
-		synchronized (sLock)
-		{
-			playerName = name;
-			sLock.notify();
-		}
-	}
-
-	@Override
-	public String subscribe() throws RemoteException
-	{
-		postStartActivity(new Intent(this.mContext, SuscribeActivity.class));
-		return getResult();
-
-	}
-	private void postStartActivity(final Intent intent)
-	{
-		mHandler.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				mContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_NEW_TASK));
-			}
-		});
-	}
 
 }

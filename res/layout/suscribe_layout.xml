@@ -7,7 +7,9 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical" 
+        android:focusable="true" 
+        android:focusableInTouchMode="true">
 
         <GridLayout
             android:layout_width="fill_parent"
@@ -51,7 +53,7 @@
                 android:layout_row="1"
                 android:hint="@string/hint_pseudo"
                 android:maxLength="15"
-                android:maxLines="1" />
+                android:maxLines="1"/>
 
             <TextView
                 android:id="@+id/instructions"
@@ -72,10 +74,10 @@
             android:orientation="vertical" >
 
             <Button
-                android:id="@+id/play_button"
+                android:id="@+id/subscribe_button"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/button_play" />
+                android:text="@string/button_subscribe" />
         </LinearLayout>
     </LinearLayout>
 
