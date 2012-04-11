@@ -3,9 +3,9 @@
 
     <string name="app_name">QuiZzz</string>
     <string name="btn_connect">Connect</string>
-    <string name="label_status">Status</string>
-    <string name="status_connected">Connected</string>
-    <string name="status_disconnected">Disconnected</string>
+    <string name="label_status">Status  </string>
+    <string name="status_connected">  Connected</string>
+    <string name="status_disconnected">  Disconnected</string>
     <string name="label_pseudo">Pseudo</string>
     <string name="hint_pseudo">tap your pseudo here </string>
     <string name="menu_connect">Connect</string>
@@ -14,19 +14,20 @@
     <string name="title_score">Score</string>
     <string name="button_subscribe">Subscribe</string>
     <string name="button_play">Start playing QuiZzz</string>
-    <string name="instruction_text">
-       Instructions \n \n
+    <string name="instruction_text">       Instructions \n \n
 		Before start playing you should \n            
             - Enter a nickname that will identify you to the remte device \n
             - Press "Play QuiZzz" button to start playing \n
-            - Enjoy !!!
-	</string>
-	<string name="title_master">Master : </string>
-	<string name="title_player_ready">Players ready</string>
-	<string name="title_click_qrcode">Click to the QRCode to zoom</string>
-	<string name="no_master_game">  No master to start the game. Please scan the code to connect first </string>
-	<string name="title_qrcode_dialog"> QR Code </string>
-	<string name="qrcode_button_text"> Go Back </string>
-	<string name="wait"> Waiting the master will start the game </string>
-		
+            - Enjoy !!!</string>
+    <string name="title_master">Master : </string>
+    <string name="title_player_ready">Players ready</string>
+    <string name="title_click_qrcode">Click to the QRCode to zoom</string>
+    <string name="no_master_game">  No master to start the game. Please scan the code to connect first </string>
+    <string name="title_qrcode_dialog"> QR Code </string>
+    <string name="qrcode_button_text"> Go Back </string>
+    <string name="wait"> Waiting the master will start the game </string>
+     <string name="title_answers"> Answers  </string>
+     <string name="btn_choose"> Choose  </string>
+     <string name="title_time_progression"> Time progression  </string>
+
 </resources>

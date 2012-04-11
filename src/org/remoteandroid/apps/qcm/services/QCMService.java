@@ -3,6 +3,7 @@ package org.remoteandroid.apps.qcm.services;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,6 +14,8 @@ import org.remoteandroid.RemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
 import org.remoteandroid.apps.qcm.ui.QCMRemoteActivity;
+import org.remoteandroid.apps.qcm.ui.QuestionActivity;
+
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -148,7 +151,9 @@ public class QCMService extends Service
 						}
 						catch (RemoteException e)
 						{
+							mPlayers.remove(player);
 							e.printStackTrace();
+							//Gerer l'echec de la souscription
 						}
 					}
 				}
@@ -158,8 +163,37 @@ public class QCMService extends Service
 	
 	public void startGame()
 	{
+		Intent intent = new Intent(this, QuestionActivity.class);
+		intent.putExtra("startTime", System.currentTimeMillis());
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		//Put the type of question
+		startActivity(intent);
+		for(final Iterator<RemoteQCM> i = mPlayers.values().iterator(); i.hasNext();)
+		{
+			final RemoteQCM player = i.next();
+			new Thread( new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					//optimiser en mettant dans une new method
+					try
+					{
+						player.play(1, System.currentTimeMillis());
+					}
+					catch (RemoteException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			}).start();
+		}
 		
 	}
+	
+	
 	
 	private boolean connect (final RemoteAndroidInfo info,final String uri, final boolean block)
 	{

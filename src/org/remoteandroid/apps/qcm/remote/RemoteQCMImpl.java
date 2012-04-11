@@ -1,5 +1,6 @@
 package org.remoteandroid.apps.qcm.remote;
 
+import org.remoteandroid.apps.qcm.ui.AnswerActivity;
 import org.remoteandroid.apps.qcm.ui.MasterActivity;
 import org.remoteandroid.apps.qcm.ui.SuscribeActivity;
 import org.remoteandroid.apps.qcm.ui.WaitingActivity;
@@ -106,6 +107,15 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 			postStartActivity(new Intent(this.mContext, WaitingActivity.class));
 			return false;
 		}
+	}
+
+	@Override
+	public int play(int question, long startTime) throws RemoteException
+	{
+		Intent intent = new Intent(this.mContext, AnswerActivity.class);
+		postStartActivity(intent);
+		
+		return 0;
 	}
 
 

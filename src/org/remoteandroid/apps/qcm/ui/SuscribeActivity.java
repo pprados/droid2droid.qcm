@@ -1,9 +1,7 @@
 package org.remoteandroid.apps.qcm.ui;
 
 import org.remoteandroid.apps.qcm.R;
-import org.remoteandroid.apps.qcm.remote.RemoteQCM;
 import org.remoteandroid.apps.qcm.remote.RemoteQCMImpl;
-import org.remoteandroid.apps.qcm.services.QCMService;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
