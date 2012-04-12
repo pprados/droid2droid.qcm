@@ -13,11 +13,11 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -32,18 +32,22 @@ import com.actionbarsherlock.app.SherlockActivity;
 public class QCMRemoteActivity extends SherlockActivity implements OnClickListener
 {
 	public static final String REGISTER = "org.remoteandroid.apps.qcm.REGISTER";
-
+	public static final boolean ADD_PLAYER = true;
+	public static final boolean REMOVE_PLAYER = false;
+	
 	private static final int MINI = 200;
 
 	private static final int MAXI = 700;
 
-	private ImageButton mQrcodeButton;
+	private ImageButton mQrcodeButton; 
+	private Button mStartGame;
 
 	private ListView list;
 	
 	private List<String> players = new ArrayList<String>();
 	ArrayAdapter<String> mAdapter;
 	private TextView master_name;
+	private Resources resources;
 
 	@Override
 	protected void onResume()
@@ -58,14 +62,16 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.remote_start_layout);
 		mQrcodeButton = (ImageButton) findViewById(R.id.qrcodeButton);
+		mStartGame = (Button) findViewById(R.id.remote_start);
 		mQrcodeButton.setOnClickListener(this);
+		mStartGame.setOnClickListener(this);
 		mQrcodeButton.setImageBitmap(getOwnQRCodeFromRA(MINI));
 		master_name = (TextView)findViewById(R.id.master_game);
 		list = (ListView) findViewById(R.id.listView);
 		mAdapter = new ArrayAdapter<String>(QCMRemoteActivity.this, android.R.layout.simple_list_item_1,android.R.id.text1, players );
 		list.setAdapter(mAdapter);
 		startService(new Intent(this, QCMService.class));
-		Log.d("TAG", "After the service");
+		resources = getResources();
 
 	}
 
@@ -81,10 +87,17 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		public void onReceive(android.content.Context context, android.content.Intent intent)
 		{
 			String nickname = intent.getExtras().getString("nickname");
-			players.add(nickname);
+			boolean type = intent.getExtras().getBoolean("type");
+			if(ADD_PLAYER==type)
+				players.add(nickname);
+			else
+				players.remove(nickname);
+			
 			mAdapter.notifyDataSetChanged();
-			if(players.size() == 1)
-				master_name.setText(nickname);
+			if(players.size() >= 1)
+				master_name.setText(players.get(0));
+			else
+				master_name.setText(resources.getText(R.string.no_master_game));
 		};
 	};
 
@@ -141,6 +154,10 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 
 				}
 			});
+		}
+		else if(view == mStartGame)
+		{
+			
 		}
 	}
 

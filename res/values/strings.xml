@@ -29,5 +29,6 @@
      <string name="title_answers"> Answers  </string>
      <string name="btn_choose"> Choose  </string>
      <string name="title_time_progression"> Time progression  </string>
+     <string name="button_remote_start">Start QuiZzz</string>
 
 </resources>

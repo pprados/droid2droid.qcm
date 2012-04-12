@@ -29,7 +29,9 @@ import android.widget.Toast;
 
 public class QCMService extends Service
 {
+	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public Map<String, RemoteQCM> mPlayers = Collections.synchronizedMap(new HashMap<String, RemoteQCM>());
+	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
 
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMService sMe;
@@ -38,7 +40,7 @@ public class QCMService extends Service
 
 	public static final String TAG = "QCM Service";
 
-	public static final String ACTION_SUSCRIBE = "org.remoteandroid.apps.qcm.SUSCRIBE_TO_REMOTE";
+//	public static final String ACTION_SUSCRIBE = "org.remoteandroid.apps.qcm.SUSCRIBE_TO_REMOTE";
 	private AtomicInteger mPlayersNumbers = new AtomicInteger(0);
 
 	private Mode mState = Mode.STOP;
@@ -47,7 +49,6 @@ public class QCMService extends Service
 	{
 		CONNECT, PLAY, WAIT, STOP,
 	}
-	
 	
 	@Override
 	public void onCreate()
@@ -100,7 +101,7 @@ public class QCMService extends Service
 	{
 		String action = intent.getAction();
 		Log.i(TAG, "Start Command " + action);
-		if(ACTION_SUSCRIBE.equals(action))
+		if(REMOTE_START_GAME.equals(action))
 		{
 		}
 		return 0;
@@ -131,18 +132,17 @@ public class QCMService extends Service
 				{
 					if(connect(info, uri, true))
 					{
-						mPlayersNumbers.incrementAndGet();
+//						mPlayersNumbers.incrementAndGet();
 						RemoteQCM player = mPlayers.get(uri);
 						try
 						{
 							String nickname = player.subscribe();
 							if(nickname!=null)
 							{
-								Intent intent = new Intent(QCMRemoteActivity.REGISTER);
-								intent.putExtra("nickname", nickname);
-								sendBroadcast(intent);
-								int number = mPlayersNumbers.get();
-								if(player.starPlay(number))
+								mPlayersNickname.put(uri, nickname);
+								managePlayer(nickname, QCMRemoteActivity.ADD_PLAYER);
+//								int number = mPlayersNumbers.get();
+								if(player.starPlay(mPlayersNumbers.incrementAndGet()))
 								{
 									Log.d("TAG","Master start the game");
 									startGame();
@@ -159,6 +159,14 @@ public class QCMService extends Service
 				}
 			}
 		}).start();
+	}
+	
+	public void managePlayer(String nickname, boolean manageType)
+	{
+		Intent intent = new Intent(QCMRemoteActivity.REGISTER);
+		intent.putExtra("nickname", nickname);
+		intent.putExtra("type", manageType);
+		sendBroadcast(intent);
 	}
 	
 	public void startGame()
@@ -211,6 +219,10 @@ public class QCMService extends Service
 			public void onServiceDisconnected(ComponentName name)
 			{
 				mPlayers.remove(uri);
+				managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
+				mPlayersNickname.remove(uri);
+				//TODO Send broadcast to remove on the liste
+				mPlayersNumbers.decrementAndGet();
 				mAndroids.remove(info);
 				if(block)
 				{
@@ -285,6 +297,8 @@ public class QCMService extends Service
 						{
 							mPlayers.remove(uri);
 							mAndroids.remove(info);
+							managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
+							mPlayersNickname.remove(uri);
 							
 						}
 						
@@ -329,6 +343,38 @@ public class QCMService extends Service
 	public IBinder onBind(Intent intent)
 	{
 		return null;
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+//		Log.d("service","Service onDestroy");
+//		for (final RemoteQCM i:mPlayers.values())
+//		{
+//			new AsyncTask<Void, Void, Void>()
+//			{
+//				@Override
+//				protected Void doInBackground(Void... params)
+//				{
+//					try
+//					{
+//						i.exit();
+//					}
+//					catch (RemoteException e)
+//					{
+//						// Ignore
+//					}
+//					return null;
+//				}
+//			}.execute();
+//		}
+//		if (mAndroids != null)
+//		{
+//			mAndroids.close();
+//		}
+//		mManager.close();
+//		sMe=null;
 	}
 
 }
