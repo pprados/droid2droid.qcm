@@ -95,7 +95,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	}
 
 	@Override
-	public boolean starPlay(int number) throws RemoteException
+	public boolean starPlayRequest(int number) throws RemoteException
 	{
 		if(number==1)
 		{
@@ -116,6 +116,12 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 		postStartActivity(intent);
 		
 		return 0;
+	}
+
+	@Override
+	public void leaveMaster() throws RemoteException
+	{
+		postStartGame(true);
 	}
 
 

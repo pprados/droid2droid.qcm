@@ -35,6 +35,8 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 	public static final boolean ADD_PLAYER = true;
 	public static final boolean REMOVE_PLAYER = false;
 	
+	private static final String BORNE = "Borne" ;
+	
 	private static final int MINI = 200;
 
 	private static final int MAXI = 700;
@@ -157,7 +159,8 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		}
 		else if(view == mStartGame)
 		{
-			
+			master_name.setText(BORNE);
+			startService(new Intent(QCMService.REMOTE_START_GAME));
 		}
 	}
 

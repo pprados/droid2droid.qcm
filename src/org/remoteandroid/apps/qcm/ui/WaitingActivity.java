@@ -13,5 +13,9 @@ public class WaitingActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.waiting_layout);
 	}
+	@Override
+	public void onBackPressed()
+	{
+	}
 
 }

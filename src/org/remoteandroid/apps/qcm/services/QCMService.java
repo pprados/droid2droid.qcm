@@ -44,6 +44,8 @@ public class QCMService extends Service
 	private AtomicInteger mPlayersNumbers = new AtomicInteger(0);
 
 	private Mode mState = Mode.STOP;
+	private boolean gameStart = false;
+	private RemoteQCM master = null;
 
 	private enum Mode 
 	{
@@ -103,6 +105,16 @@ public class QCMService extends Service
 		Log.i(TAG, "Start Command " + action);
 		if(REMOTE_START_GAME.equals(action))
 		{
+			if(master!=null)
+				try
+				{
+					master.leaveMaster();
+				}
+				catch (RemoteException e)
+				{
+					e.printStackTrace();
+				}
+				
 		}
 		return 0;
 	}
@@ -142,11 +154,14 @@ public class QCMService extends Service
 								mPlayersNickname.put(uri, nickname);
 								managePlayer(nickname, QCMRemoteActivity.ADD_PLAYER);
 //								int number = mPlayersNumbers.get();
-								if(player.starPlay(mPlayersNumbers.incrementAndGet()))
+								master=player;
+								if(player.starPlayRequest(mPlayersNumbers.incrementAndGet()))
 								{
 									Log.d("TAG","Master start the game");
 									startGame();
 								}
+								else
+									master=null;
 							}
 						}
 						catch (RemoteException e)

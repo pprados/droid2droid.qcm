@@ -65,7 +65,7 @@
         </activity>
         <service android:name=".services.QCMService">
             <intent-filter >
-                <action android:name="org.remoteandroid.apps.qcm.SUSCRIBE_TO_REMOTE"/>
+                <action android:name="org.remoteandroid.apps.qcm.REMOTE_START_GAME"/>
             </intent-filter>
         </service>
         <service android:name=".remote.RemoteQCMService">
