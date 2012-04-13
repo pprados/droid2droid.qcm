@@ -7,17 +7,23 @@ import java.util.List;
 
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
+import org.remoteandroid.apps.qcm.model.Question;
+import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.services.QCMService;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -74,7 +80,8 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		list.setAdapter(mAdapter);
 		startService(new Intent(this, QCMService.class));
 		resources = getResources();
-
+//		Question  question= new XMLParser(this).getQuestion(7);
+	
 	}
 
 	@Override
@@ -163,5 +170,4 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 			startService(new Intent(QCMService.REMOTE_START_GAME));
 		}
 	}
-
 }

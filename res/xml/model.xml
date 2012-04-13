@@ -2,78 +2,78 @@
 <questions>
     <question id="1" type="radio">
         <message>De quelle couleur est le Bugdroid (logo d'Android) ?</message>
-        <value id="1">Jaune</value>
-        <value id="2" good="true">Vert</value>
-        <value id="3">Bleu</value>
+        <value>Jaune</value>
+        <value good="true">Vert</value>
+        <value >Bleu</value>
     </question>
     <question id="2" type="radio">
         <message>En quelle année a été lancé le premier smartphone Android ?</message>
-        <value id="1">2005</value>
-        <value id="2">2007</value>
-        <value id="3">2008</value>
+        <value >2005</value>
+        <value >2007</value>
+        <value good="true">2008</value>
     </question>
     <question id="3" type="radio">
         <message>Quel est le nom du premier smartphone Android ?</message>
-        <value id="1">gPhone</value>
-        <value id="2">Google Phone</value>
-        <value id="3">Androphone</value>
+        <value good="true">gPhone</value>
+        <value >Google Phone</value>
+        <value >Androphone</value>
     </question>
     <question id="4" type="radio">
         <message>Combien de distribution d'Android y a t'il actuellement ?</message>
-        <value id="1">5</value>
-        <value id="2">7</value>
-        <value id="3">9</value>
+        <value >5</value>
+        <value good="true">7</value>
+        <value >9</value>
     </question>
     <question id="5" type="radio">
         <message>Les noms des versions d'Android sont : </message>
-        <value id="1">des noms de personnages de dessins animés</value>
-        <value id="2">des noms de gateaux</value>
-        <value id="3">des noms de jeune filles</value>
-        <value id="4">sont choisi par au hazard</value>
+        <value >des noms de personnages de dessins animés</value>
+        <value good="true">des noms de desserts</value>
+        <value >des noms de jeune filles</value>
+        <value >sont choisi par au hazard</value>
     </question>
     <question id="6" type="radio">
         <message>Quelle marque est le fournisseur des téléphones Android ? </message>
-        <value id="1">Motorola</value>
-        <value id="2">HTC</value>
-        <value id="3">Google</value>
-        <value id="4">Aucun</value>
+        <value >Motorola</value>
+        <value >HTC</value>
+        <value >Google</value>
+        <value good="true">Aucun</value>
     </question>
     <question id="7" type="check">
         <message>Ou trouvent t'on des Androids ?</message>
-        <value id="1">Frigo</value>
-        <value id="2">Voiture</value>
-        <value id="3">TV</value>
-        <value id="4">Montre</value>
-        <value id="5">Scooter</value>
-        <value id="6">Imprimante</value>
-        <value id="7">Tablette</value>
+        <value good="true">Frigo</value>
+        <value good="true">Voiture</value>
+        <value good="true">TV</value>
+        <value good="true">Montre</value>
+        <value >Scooter</value>
+        <value good="true">Imprimante</value>
+        <value good="true">Tablette</value>
     </question>
     <question id="8" type="radio">
         <message>Combien d'activation d'Android par jour ?</message>
-        <value id="1">moins de 100.000</value>
-        <value id="2">moins de 300.000 </value>
-        <value id="3">moins de 550.000</value>
-        <value id="4">moins de 800.000</value>
-        <value id="5">plus de 800.000</value>
+        <value >moins de 100.000</value>
+        <value >moins de 300.000 </value>
+        <value >moins de 550.000</value>
+        <value >moins de 800.000</value>
+        <value good="true">plus de 800.000</value>
     </question>
     <question id="9" type="check">
         <message>Quels sont les technologies disponibles dans les téléphones Android ?</message>
-        <value id="1">Bluetooth</value>
-        <value id="2">NFC</value>
-        <value id="3">Wifi Direct</value>
-        <value id="4">GPS</value>
-        <value id="5">Baromètre</value>
-        <value id="6">Température</value>
-        <value id="7">Ethernet</value>
-        <value id="8">Wifi</value>
-        <value id="9">3G</value>
-        <value id="10">4G</value>
-        <value id="11">5G</value>
+        <value good="true">Bluetooth</value>
+        <value good="true">NFC</value>
+        <value good="true">Wifi Direct</value>
+        <value good="true">GPS</value>
+        <value good="true">Baromètre</value>
+        <value good="true">Température</value>
+        <value >Ethernet</value>
+        <value good="true">Wifi</value>
+        <value good="true">3G</value>
+        <value good="true">4G</value>
+        <value >5G</value>
     </question>
-    <question id="10" type="radio">
+    <question id="10" >
         <message>Les applications publiées : </message>
-        <value id="1">sont toutes validés par Google</value>
-        <value id="2">sont publiées par Google uniquement</value>
-        <value id="3">sont publiés par différentes places de marchées</value>
+        <value >sont toutes validés par Google</value>
+        <value >sont publiées par Google uniquement</value>
+        <value good="true">sont publiés par différentes places de marchées</value>
     </question>
 </questions>
