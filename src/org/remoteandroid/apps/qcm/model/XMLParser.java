@@ -13,6 +13,8 @@ import android.util.Log;
 
 public class XMLParser
 {
+	public static final int MAX_QUESTION = 5;
+	public static final int  TOTAL_NUMBER_OF_QUESTION= 10;
 	public static final String SINGLE = "radio";
 	public static final String MULTIPLE = "check";
 	public static final String QUESTION="question";

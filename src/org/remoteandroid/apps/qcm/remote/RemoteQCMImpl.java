@@ -110,12 +110,14 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	}
 
 	@Override
-	public int play(int question, long startTime) throws RemoteException
+	public String play(int questionNumber, long startTime) throws RemoteException
 	{
 		Intent intent = new Intent(this.mContext, AnswerActivity.class);
+		intent.putExtra("startTime", startTime);
+		intent.putExtra("questionNumber", questionNumber);
 		postStartActivity(intent);
 		
-		return 0;
+		return null;
 	}
 
 	@Override

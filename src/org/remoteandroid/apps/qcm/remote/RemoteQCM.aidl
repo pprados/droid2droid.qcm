@@ -4,5 +4,5 @@ interface RemoteQCM
 	String subscribe();
 	boolean starPlayRequest(int number);
 	void leaveMaster();
-	int play(int question, long startTime);	
+	String play(int question, long startTime);	
 }

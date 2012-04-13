@@ -73,6 +73,10 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		mStartGame = (Button) findViewById(R.id.remote_start);
 		mQrcodeButton.setOnClickListener(this);
 		mStartGame.setOnClickListener(this);
+		if(players.size()==0)
+			mStartGame.setEnabled(false);
+		else
+			mStartGame.setEnabled(true);
 		mQrcodeButton.setImageBitmap(getOwnQRCodeFromRA(MINI));
 		master_name = (TextView)findViewById(R.id.master_game);
 		list = (ListView) findViewById(R.id.listView);
@@ -104,9 +108,18 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 			
 			mAdapter.notifyDataSetChanged();
 			if(players.size() >= 1)
+			{
 				master_name.setText(players.get(0));
+				mStartGame.setEnabled(true);
+			}
+				
 			else
+			{
 				master_name.setText(resources.getText(R.string.no_master_game));
+				mStartGame.setEnabled(false);
+			}
+				
+			
 		};
 	};
 

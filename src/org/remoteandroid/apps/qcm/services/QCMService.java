@@ -1,6 +1,7 @@
 package org.remoteandroid.apps.qcm.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import org.remoteandroid.RemoteAndroid;
 import org.remoteandroid.RemoteAndroid.PublishListener;
 import org.remoteandroid.RemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroidManager;
+import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
 import org.remoteandroid.apps.qcm.ui.QCMRemoteActivity;
 import org.remoteandroid.apps.qcm.ui.QuestionActivity;
@@ -32,7 +34,7 @@ public class QCMService extends Service
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public Map<String, RemoteQCM> mPlayers = Collections.synchronizedMap(new HashMap<String, RemoteQCM>());
 	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
-
+	public static final int TIME = 20;
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMService sMe;
 
@@ -158,7 +160,7 @@ public class QCMService extends Service
 								if(player.starPlayRequest(mPlayersNumbers.incrementAndGet()))
 								{
 									Log.d("TAG","Master start the game");
-									startGame();
+									startGame(uri);
 								}
 								else
 									master=null;
@@ -167,6 +169,7 @@ public class QCMService extends Service
 						catch (RemoteException e)
 						{
 							mPlayers.remove(player);
+							managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
 							e.printStackTrace();
 							//Gerer l'echec de la souscription
 						}
@@ -184,13 +187,21 @@ public class QCMService extends Service
 		sendBroadcast(intent);
 	}
 	
-	public void startGame()
+	public void startGame(final String uri)
 	{
-		Intent intent = new Intent(this, QuestionActivity.class);
-		intent.putExtra("startTime", System.currentTimeMillis());
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
 		//Put the type of question
+		ArrayList<Integer> questionList = new ArrayList<Integer>();
+		for(int i= 1 ; i<= XMLParser.TOTAL_NUMBER_OF_QUESTION; i++)
+			questionList.add(i);
+		Collections.shuffle(questionList);
+		final int questionNumber = questionList.get(0);
+		Intent intent = new Intent(this, QuestionActivity.class);
+		intent.putExtra("questionNumber", questionNumber);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
+		
+		//Other
 		for(final Iterator<RemoteQCM> i = mPlayers.values().iterator(); i.hasNext();)
 		{
 			final RemoteQCM player = i.next();
@@ -202,11 +213,12 @@ public class QCMService extends Service
 					//optimiser en mettant dans une new method
 					try
 					{
-						player.play(1, System.currentTimeMillis());
+						player.play(questionNumber, QCMService.TIME);
 					}
 					catch (RemoteException e)
 					{
-						// TODO Auto-generated catch block
+						mPlayers.remove(player);
+						managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
 						e.printStackTrace();
 					}
 					
@@ -360,6 +372,12 @@ public class QCMService extends Service
 		return null;
 	}
 	
+//	public void getRandom()
+//	{
+//		int[] values = {1,2,3,4,5,6,7,8,9,10}; 
+//		Collections.shuffle(values);
+//	}
+//	
 	@Override
 	public void onDestroy()
 	{

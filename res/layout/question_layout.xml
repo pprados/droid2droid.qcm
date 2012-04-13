@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dip"
         android:layout_marginTop="5dip"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
         <TextView
             style="@style/titleStyle"
@@ -46,7 +46,7 @@
         style="@style/simpleTextStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dip" />
+        android:layout_margin="5dip" />
 
     <TextView
         style="@style/titleStyle"
@@ -55,22 +55,10 @@
         android:layout_marginBottom="5dip"
         android:text="@string/title_answers" />
 
-    <TextView
+    <TextView android:id="@+id/answer_list"
         style="@style/simpleTextStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dip" />
-
-    <TextView
-        style="@style/simpleTextStyle"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dip" />
-
-    <TextView
-        style="@style/simpleTextStyle"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dip" />
+        android:layout_margin="5dip" />
 
 </LinearLayout>
