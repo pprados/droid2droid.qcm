@@ -156,7 +156,7 @@ public class AnswerActivity extends Activity implements OnClickListener
 				MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
 				for(int i=0; i<mQuestion.getValues().size();i++)
 					if(cb[i].isChecked())
-						answers.add(rb[i].getText().toString());
+						answers.add(cb[i].getText().toString());
 			}
 			RemoteQCMImpl.postResults(answers);
 			finish();
