@@ -1,5 +1,7 @@
 package org.remoteandroid.apps.qcm.remote;
 
+import java.util.List;
+
 import org.remoteandroid.apps.qcm.ui.AnswerActivity;
 import org.remoteandroid.apps.qcm.ui.MasterActivity;
 import org.remoteandroid.apps.qcm.ui.SuscribeActivity;
@@ -18,6 +20,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 //	public static long time = 60000L;
 	private static String playerName;
 	private static boolean startValue;
+	private static List<String> results;
 
 	public RemoteQCMImpl(Context context)
 	{
@@ -110,14 +113,37 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	}
 
 	@Override
-	public String play(int questionNumber, long startTime) throws RemoteException
+	public List<String> play(int questionNumber, long startTime) throws RemoteException
 	{
 		Intent intent = new Intent(this.mContext, AnswerActivity.class);
 		intent.putExtra("startTime", startTime);
 		intent.putExtra("questionNumber", questionNumber);
 		postStartActivity(intent);
-		
-		return null;
+		return getResults();
+	}
+	
+	private static List<String> getResults()
+	{
+		synchronized (sLock)
+		{
+			try
+			{
+				sLock.wait();
+				return results;
+			}
+			catch (InterruptedException e)
+			{
+				return null;
+			}
+		}
+	}
+	public static void postResults(List<String> results)
+	{
+		synchronized (sLock)
+		{
+			RemoteQCMImpl.results = results;
+			sLock.notify();
+		}
 	}
 
 	@Override

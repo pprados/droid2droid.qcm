@@ -32,8 +32,8 @@ import android.widget.Toast;
 public class QCMService extends Service
 {
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
-	public Map<String, RemoteQCM> mPlayers = Collections.synchronizedMap(new HashMap<String, RemoteQCM>());
-	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
+	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
+//	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
 	public static final int TIME = 20;
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMService sMe;
@@ -147,29 +147,33 @@ public class QCMService extends Service
 					if(connect(info, uri, true))
 					{
 //						mPlayersNumbers.incrementAndGet();
-						RemoteQCM player = mPlayers.get(uri);
+						Player player = mPlayers.get(uri);
+						RemoteQCM remotePlayer = player.getPlayer();
 						try
 						{
-							String nickname = player.subscribe();
+							String nickname = remotePlayer.subscribe();
 							if(nickname!=null)
 							{
-								mPlayersNickname.put(uri, nickname);
+//								mPlayersNickname.put(uri, nickname);
+								player.setNickname(nickname);
 								managePlayer(nickname, QCMRemoteActivity.ADD_PLAYER);
 //								int number = mPlayersNumbers.get();
-								master=player;
-								if(player.starPlayRequest(mPlayersNumbers.incrementAndGet()))
+								master=remotePlayer;
+								if(remotePlayer.starPlayRequest(mPlayersNumbers.incrementAndGet()))
 								{
 									Log.d("TAG","Master start the game");
-									startGame(uri);
+									startGame();
 								}
 								else
 									master=null;
+								player.setNickname(nickname);
 							}
 						}
 						catch (RemoteException e)
 						{
+							mPlayers.remove(remotePlayer);
+							managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
 							mPlayers.remove(player);
-							managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
 							e.printStackTrace();
 							//Gerer l'echec de la souscription
 						}
@@ -187,7 +191,7 @@ public class QCMService extends Service
 		sendBroadcast(intent);
 	}
 	
-	public void startGame(final String uri)
+	public void startGame()
 	{
 		
 		//Put the type of question
@@ -202,9 +206,9 @@ public class QCMService extends Service
 		startActivity(intent);
 		
 		//Other
-		for(final Iterator<RemoteQCM> i = mPlayers.values().iterator(); i.hasNext();)
+		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 		{
-			final RemoteQCM player = i.next();
+			final RemoteQCM player = i.next().getPlayer();
 			new Thread( new Runnable()
 			{
 				@Override
@@ -218,7 +222,8 @@ public class QCMService extends Service
 					catch (RemoteException e)
 					{
 						mPlayers.remove(player);
-						managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
+						managePlayer(((Player) i).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
+						mPlayers.remove(i);
 						e.printStackTrace();
 					}
 					
@@ -246,8 +251,9 @@ public class QCMService extends Service
 			public void onServiceDisconnected(ComponentName name)
 			{
 				mPlayers.remove(uri);
-				managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
-				mPlayersNickname.remove(uri);
+				managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER); //FIXME Null pointer exception on disconnect
+//				mPlayersNickname.remove(uri);
+				mPlayers.remove(uri);
 				//TODO Send broadcast to remove on the liste
 				mPlayersNumbers.decrementAndGet();
 				mAndroids.remove(info);
@@ -292,18 +298,20 @@ public class QCMService extends Service
 							{
 								rA.bindService(new Intent("org.remoteandroid.apps.QCM.RemoteService"), new ServiceConnection()
 								{
-									RemoteQCM player;
+									RemoteQCM remotePlayer;
 									@Override
 									public void onServiceDisconnected(ComponentName name)
 									{
-										player=null;
+										remotePlayer=null;
 										
 									}
 									
 									@Override
 									public void onServiceConnected(ComponentName name, IBinder service)
 									{
-										player = RemoteQCM.Stub.asInterface(service);
+										remotePlayer = RemoteQCM.Stub.asInterface(service);
+										Player player = new Player();
+										player.setPlayer(remotePlayer);
 										mPlayers.put(uri, player);
 										if(block)
 										{
@@ -324,8 +332,9 @@ public class QCMService extends Service
 						{
 							mPlayers.remove(uri);
 							mAndroids.remove(info);
-							managePlayer(mPlayersNickname.get(uri), QCMRemoteActivity.REMOVE_PLAYER);
-							mPlayersNickname.remove(uri);
+							managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
+//							mPlayersNickname.remove(uri);
+							mPlayers.remove(uri);
 							
 						}
 						

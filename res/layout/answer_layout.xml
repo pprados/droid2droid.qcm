@@ -29,9 +29,11 @@
 	        android:text="@string/title_answers"
 	        android:layout_marginBottom="5dip"/>
 	    
-		<View android:id="@+id/answerView"
+		<LinearLayout android:id="@+id/answerView"
 		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"/>
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical">
+		</LinearLayout>
 		
 	    <Button android:id="@+id/select_answer"
 	        android:layout_width="fill_parent"
