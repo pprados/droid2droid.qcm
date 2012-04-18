@@ -510,7 +510,9 @@ public class QCMService extends Service
 	{
 		if(manage)
 		{
-			startActivity(new Intent(QCMService.this, RemoteResult.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+			startActivity(new Intent(QCMService.this, RemoteResult.class)
+				.putExtra("winner", winner)
+				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 		}
 		else 
 		{
