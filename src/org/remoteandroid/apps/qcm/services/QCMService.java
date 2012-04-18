@@ -237,7 +237,7 @@ public class QCMService extends Service
 							if(XMLParser.SINGLE.equals(question.getType()))
 							{
 								SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
-								if(sQuestion.getAnswer().equals(results.get(0)) && winner != null)
+								if(sQuestion.getAnswer().equals(results.get(0)) && winner == null)
 								{
 									setWinner(player.getNickname());
 									player.incrementScore();
@@ -251,7 +251,7 @@ public class QCMService extends Service
 							else if(XMLParser.MULTIPLE.equals(question.getType()))
 							{
 								MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
-								if(mQuestion.getAnswers().equals(results) && winner != null)
+								if(mQuestion.getAnswers().equals(results) && winner == null)
 								{
 									setWinner(player.getNickname());
 									player.incrementScore();
