@@ -63,6 +63,16 @@
             android:configChanges="orientation">
             
         </activity>
+        <activity android:name=".ui.ClientResult"
+            android:theme="@style/Theme.Sherlock.Light"
+            android:configChanges="orientation">
+            
+        </activity>
+        <activity android:name=".ui.RemoteResult"
+            android:theme="@style/Theme.Sherlock.Light"
+            android:configChanges="orientation">
+            
+        </activity>
         <service android:name=".services.QCMService">
             <intent-filter >
                 <action android:name="org.remoteandroid.apps.qcm.REMOTE_START_GAME"/>

@@ -20,6 +20,7 @@ import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
 import org.remoteandroid.apps.qcm.ui.QCMRemoteActivity;
 import org.remoteandroid.apps.qcm.ui.QuestionActivity;
+import org.remoteandroid.apps.qcm.ui.RemoteResult;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Service;
@@ -236,9 +237,10 @@ public class QCMService extends Service
 							if(XMLParser.SINGLE.equals(question.getType()))
 							{
 								SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
-								if(sQuestion.getAnswer().equals(results.get(0)))
+								if(sQuestion.getAnswer().equals(results.get(0)) && winner != null)
 								{
 									setWinner(player.getNickname());
+									player.incrementScore();
 									//TODO Annuler tout le choix chez tous les autres
 									Log.d("TAG", "Simple Choice good question");
 									restart();
@@ -249,8 +251,10 @@ public class QCMService extends Service
 							else if(XMLParser.MULTIPLE.equals(question.getType()))
 							{
 								MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
-								if(mQuestion.getAnswers().equals(results))
+								if(mQuestion.getAnswers().equals(results) && winner != null)
 								{
+									setWinner(player.getNickname());
+									player.incrementScore();
 									//TODO Annuler tout le choix chez tous les autres
 									Log.d("TAG", "Multiple Choice good question");
 									restart();
@@ -287,6 +291,7 @@ public class QCMService extends Service
 		}
 		stop();
 		Log.d("TAG", "Multiple Choice good question");
+		startAndStopResultScreen(winner, true);
 		
 	}
 	
@@ -501,13 +506,36 @@ public class QCMService extends Service
 			sLock.notify();
 		}
 	}
-	private void stopAllPlayer()
+	private void startAndStopResultScreen(final String winner, final boolean manage)
 	{
-		if(getWinner()==null)
+		if(manage)
 		{
+			startActivity(new Intent(QCMService.this, RemoteResult.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+		}
+		else 
+		{
+			sendBroadcast(new Intent(RemoteResult.FINISH));
 			
 		}
-		
+		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
+		{
+			final Player player = i.next();
+			new Thread( new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					try
+					{
+						player.getPlayer().startAndStopResultScreen(winner, player.getScore(), manage);
+					} catch (RemoteException e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}).start();
+		}
 	}
+		
 
 }

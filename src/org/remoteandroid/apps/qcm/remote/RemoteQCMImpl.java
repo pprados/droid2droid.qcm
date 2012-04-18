@@ -3,6 +3,7 @@ package org.remoteandroid.apps.qcm.remote;
 import java.util.List;
 
 import org.remoteandroid.apps.qcm.ui.AnswerActivity;
+import org.remoteandroid.apps.qcm.ui.ClientResult;
 import org.remoteandroid.apps.qcm.ui.MasterActivity;
 import org.remoteandroid.apps.qcm.ui.SuscribeActivity;
 import org.remoteandroid.apps.qcm.ui.WaitingActivity;
@@ -162,5 +163,23 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 				System.exit(0);
 			}
 		}.start();
+	}
+
+	@Override
+	public void startAndStopResultScreen(String winner, int score, boolean manage) throws RemoteException
+	{
+		if(manage)
+		{
+			postResults(null);
+			Intent intent = new Intent(mContext, ClientResult.class);
+			intent.putExtra("winner", winner);
+			intent.putExtra("score", score);
+			postStartActivity(intent);
+		}
+		else 
+		{
+			mContext.sendBroadcast(new Intent(ClientResult.FINISH));
+		}
+
 	}
 }

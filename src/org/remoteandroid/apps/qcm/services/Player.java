@@ -6,15 +6,18 @@ public class Player
 {
 	private RemoteQCM player;
 	private String nickname;
+	private int score;
 	public Player()
 	{
 		this.player = null;
 		this.nickname = null;
+		this.score = 0;
 	}
 	public Player(RemoteQCM player, String nickname)
 	{
 		this.player=player;
 		this.nickname=nickname;
+		this.score = 0;
 	}
 	public RemoteQCM getPlayer()
 	{
@@ -32,5 +35,17 @@ public class Player
 	{
 		this.nickname = nickname;
 	}
-
+	public int getScore()
+	{
+		return score;
+	}
+	public void setScore(int score)
+	{
+		this.score = score;
+	}
+	public void incrementScore()
+	{
+		this.score ++;
+	}
+	
 }
