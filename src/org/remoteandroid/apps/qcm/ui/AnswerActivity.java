@@ -14,6 +14,8 @@ import org.remoteandroid.apps.qcm.services.QCMService;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -27,6 +29,7 @@ import android.widget.RadioGroup;
 
 public class AnswerActivity extends Activity implements OnClickListener
 {
+	public static final String FINISH_RESPONSEACTIVITY = "org.remoteandroid.apps.qcm.FINISH_RESPONSEACTIVITY";
 	private AsyncTask<?, ?, ?>	mAsyncTask;
 	private long startTime;
 	private ProgressBar mTimeBar;
@@ -36,6 +39,12 @@ public class AnswerActivity extends Activity implements OnClickListener
 	CheckBox [] cb;
 	private List<String> answers;
 	private Button selectAnswer;
+	protected void onResume()
+	{
+		super.onResume();
+		registerReceiver(mReceiver, new IntentFilter(FINISH_RESPONSEACTIVITY));
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -128,6 +137,7 @@ public class AnswerActivity extends Activity implements OnClickListener
 			protected void onPostExecute(Void result)
 			{
 				RemoteQCMImpl.postResults(null);
+				finish();
 			};
 		}.execute();
 	}
@@ -164,5 +174,12 @@ public class AnswerActivity extends Activity implements OnClickListener
 		}
 		
 	}
+	private BroadcastReceiver mReceiver = new BroadcastReceiver()
+	{
+		public void onReceive(android.content.Context context, android.content.Intent intent)
+		{
+			finish();
+		};
+	};
 	
 }

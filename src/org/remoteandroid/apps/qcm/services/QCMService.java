@@ -40,7 +40,7 @@ public class QCMService extends Service
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
 //	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
-	public static final int TIME = 200;
+	public static final int TIME = 10;
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMService sMe;
 
@@ -207,91 +207,191 @@ public class QCMService extends Service
 		for(int i= 1 ; i<= XMLParser.TOTAL_NUMBER_OF_QUESTION; i++)
 			questionList.add(i);
 		Collections.shuffle(questionList);
-		final int questionNumber = questionList.get(0);
-		Intent intent = new Intent(this, QuestionActivity.class);
-		intent.putExtra("questionNumber", questionNumber); 
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
-		
-		//Get a parser of question 
-		final XMLParser parser = new XMLParser(this);
-		//Atomic integer of number of player who have fail to th question 
-		final AtomicInteger badQuestion = new AtomicInteger(0);
-		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
+		for(int num = 1; num<= XMLParser.MAX_QUESTION; num++ )
 		{
-			final Player player = i.next();
-			new Thread( new Runnable()
+			final int questionNumber = questionList.get(num);
+			Intent intent = new Intent(this, QuestionActivity.class);
+			intent.putExtra("questionNumber", questionNumber); 
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
+			
+			//Get a parser of question 
+			final XMLParser parser = new XMLParser(this);
+			//Atomic integer of number of player who have fail to th question 
+			final AtomicInteger badQuestion = new AtomicInteger(0);
+			for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 			{
-				@Override
-				public void run()
+				final Player player = i.next();
+				new Thread( new Runnable()
 				{
-					//optimiser en mettant dans une nouvelle method
-					try
+					@Override
+					public void run()
 					{
-						ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMService.TIME);
-						if(results==null)
-							badQuestion.incrementAndGet();
-						else
+						//optimiser en mettant dans une nouvelle method
+						try
 						{
-							Question question = parser.getQuestion(questionNumber);
-							if(XMLParser.SINGLE.equals(question.getType()))
+							ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMService.TIME);
+							if(results==null)
+								badQuestion.incrementAndGet();
+							else
 							{
-								SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
-								if(sQuestion.getAnswer().equals(results.get(0)) && winner == null)
+								Question question = parser.getQuestion(questionNumber);
+								if(XMLParser.SINGLE.equals(question.getType()))
 								{
-									setWinner(player.getNickname());
-									player.incrementScore();
-									//TODO Annuler tout le choix chez tous les autres
-									Log.d("TAG", "Simple Choice good question");
-									restart();
+									SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
+									if(sQuestion.getAnswer().equals(results.get(0)) && winner == null)
+									{
+										setWinner(player.getNickname());
+										player.incrementScore();
+										//TODO Annuler tout le choix chez tous les autres
+										Log.d("TAG", "Simple Choice good question");
+										restart();
+									}
+									else
+										badQuestion.incrementAndGet();
 								}
-								else
-									badQuestion.incrementAndGet();
+								else if(XMLParser.MULTIPLE.equals(question.getType()))
+								{
+									MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
+									if(mQuestion.getAnswers().equals(results) && winner == null)
+									{
+										setWinner(player.getNickname());
+										player.incrementScore();
+										//TODO Annuler tout le choix chez tous les autres
+										Log.d("TAG", "Multiple Choice good question");
+										restart();
+									}
+									else 
+										badQuestion.incrementAndGet();
+								}							
 							}
-							else if(XMLParser.MULTIPLE.equals(question.getType()))
+							
+							//Checker si tout le monde a répondu faux 
+							if(mPlayers.size() == badQuestion.get())
 							{
-								MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
-								if(mQuestion.getAnswers().equals(results) && winner == null)
-								{
-									setWinner(player.getNickname());
-									player.incrementScore();
-									//TODO Annuler tout le choix chez tous les autres
-									Log.d("TAG", "Multiple Choice good question");
-									restart();
-								}
-								else 
-									badQuestion.incrementAndGet();
-							}							
+								//Lancer l'ecan qui dit que personne n'a gagné
+								restart();
+							}
+								
+						}
+						catch (RemoteException e)
+						{
+//							mPlayers.remove(player);
+							managePlayer(((Player) i).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
+							mPlayers.remove(i);
+							e.printStackTrace();
+						} catch (XmlPullParserException e)
+						{
+							e.printStackTrace();
+						} catch (IOException e)
+						{
+							e.printStackTrace();
 						}
 						
-						//Checker si tout le monde a répondu faux 
-						if(mPlayers.size() == badQuestion.get())
-						{
-							//Lancer l'ecan qui dit que personne n'a gagné
-							restart();
-						}
-							
 					}
-					catch (RemoteException e)
-					{
-//						mPlayers.remove(player);
-						managePlayer(((Player) i).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
-						mPlayers.remove(i);
-						e.printStackTrace();
-					} catch (XmlPullParserException e)
-					{
-						e.printStackTrace();
-					} catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-					
+				}).start();
+			}
+			stop();
+			Log.d("TAG", "Multiple Choice good question");
+			startAndStopResultScreen(winner, true);
+			synchronized (sLock)
+			{
+				try
+				{
+					sLock.wait(3000);
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
 				}
-			}).start();
+			}
+			startAndStopResultScreen(winner, false);
+			setWinner(null);
 		}
-		stop();
-		Log.d("TAG", "Multiple Choice good question");
-		startAndStopResultScreen(winner, true);
+//		final int questionNumber = questionList.get(0);
+//		Intent intent = new Intent(this, QuestionActivity.class);
+//		intent.putExtra("questionNumber", questionNumber); 
+//		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//		startActivity(intent);
+//		
+//		//Get a parser of question 
+//		final XMLParser parser = new XMLParser(this);
+//		//Atomic integer of number of player who have fail to th question 
+//		final AtomicInteger badQuestion = new AtomicInteger(0);
+//		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
+//		{
+//			final Player player = i.next();
+//			new Thread( new Runnable()
+//			{
+//				@Override
+//				public void run()
+//				{
+//					//optimiser en mettant dans une nouvelle method
+//					try
+//					{
+//						ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMService.TIME);
+//						if(results==null)
+//							badQuestion.incrementAndGet();
+//						else
+//						{
+//							Question question = parser.getQuestion(questionNumber);
+//							if(XMLParser.SINGLE.equals(question.getType()))
+//							{
+//								SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
+//								if(sQuestion.getAnswer().equals(results.get(0)) && winner == null)
+//								{
+//									setWinner(player.getNickname());
+//									player.incrementScore();
+//									//TODO Annuler tout le choix chez tous les autres
+//									Log.d("TAG", "Simple Choice good question");
+//									restart();
+//								}
+//								else
+//									badQuestion.incrementAndGet();
+//							}
+//							else if(XMLParser.MULTIPLE.equals(question.getType()))
+//							{
+//								MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
+//								if(mQuestion.getAnswers().equals(results) && winner == null)
+//								{
+//									setWinner(player.getNickname());
+//									player.incrementScore();
+//									//TODO Annuler tout le choix chez tous les autres
+//									Log.d("TAG", "Multiple Choice good question");
+//									restart();
+//								}
+//								else 
+//									badQuestion.incrementAndGet();
+//							}							
+//						}
+//						
+//						//Checker si tout le monde a répondu faux 
+//						if(mPlayers.size() == badQuestion.get())
+//						{
+//							//Lancer l'ecan qui dit que personne n'a gagné
+//							restart();
+//						}
+//							
+//					}
+//					catch (RemoteException e)
+//					{
+////						mPlayers.remove(player);
+//						managePlayer(((Player) i).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
+//						mPlayers.remove(i);
+//						e.printStackTrace();
+//					} catch (XmlPullParserException e)
+//					{
+//						e.printStackTrace();
+//					} catch (IOException e)
+//					{
+//						e.printStackTrace();
+//					}
+//					
+//				}
+//			}).start();
+//		}
+//		stop();
+//		Log.d("TAG", "Multiple Choice good question");
+//		startAndStopResultScreen(winner, true);
 		
 	}
 	
@@ -513,6 +613,7 @@ public class QCMService extends Service
 			startActivity(new Intent(QCMService.this, RemoteResult.class)
 				.putExtra("winner", winner)
 				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+			sendBroadcast(new Intent(QuestionActivity.FINISH_QUESTIONACTIVITY));
 		}
 		else 
 		{

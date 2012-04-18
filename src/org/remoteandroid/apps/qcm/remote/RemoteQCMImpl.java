@@ -171,6 +171,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 		if(manage)
 		{
 			postResults(null);
+			mContext.sendBroadcast(new Intent(AnswerActivity.FINISH_RESPONSEACTIVITY));
 			Intent intent = new Intent(mContext, ClientResult.class);
 			intent.putExtra("winner", winner);
 			intent.putExtra("score", score);

@@ -39,7 +39,7 @@ public class RemoteResult extends SherlockActivity
 		}
 		else 
 		{
-			mImage.setImageDrawable((getResources().getDrawable(R.drawable.win)));
+			mImage.setImageDrawable((getResources().getDrawable(R.drawable.loose)));
 			mWinner.setText("No winner");
 		}
 	}
