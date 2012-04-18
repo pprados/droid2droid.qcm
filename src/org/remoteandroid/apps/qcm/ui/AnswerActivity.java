@@ -127,6 +127,7 @@ public class AnswerActivity extends Activity implements OnClickListener
 
 			protected void onPostExecute(Void result)
 			{
+				RemoteQCMImpl.postResults(null);
 			};
 		}.execute();
 	}

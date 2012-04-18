@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,10 +14,14 @@ import org.remoteandroid.RemoteAndroid;
 import org.remoteandroid.RemoteAndroid.PublishListener;
 import org.remoteandroid.RemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroidManager;
+import org.remoteandroid.apps.qcm.model.MultipleChoicesQuestion;
+import org.remoteandroid.apps.qcm.model.Question;
+import org.remoteandroid.apps.qcm.model.SimpleChoiceQuestion;
 import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
 import org.remoteandroid.apps.qcm.ui.QCMRemoteActivity;
 import org.remoteandroid.apps.qcm.ui.QuestionActivity;
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -34,7 +39,7 @@ public class QCMService extends Service
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
 //	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
-	public static final int TIME = 20;
+	public static final int TIME = 200;
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMService sMe;
 
@@ -201,11 +206,14 @@ public class QCMService extends Service
 		Collections.shuffle(questionList);
 		final int questionNumber = questionList.get(0);
 		Intent intent = new Intent(this, QuestionActivity.class);
-		intent.putExtra("questionNumber", questionNumber);
+		intent.putExtra("questionNumber", 7); //change after
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
 		
-		//Other
+		//Get a parser of question 
+		final XMLParser parser = new XMLParser(this);
+		//Atomic integer of number of player who have fail to th question 
+		final AtomicInteger badQuestion = new AtomicInteger(0);
 		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 		{
 			final RemoteQCM player = i.next().getPlayer();
@@ -214,16 +222,57 @@ public class QCMService extends Service
 				@Override
 				public void run()
 				{
-					//optimiser en mettant dans une new method
+					//optimiser en mettant dans une nouvelle method
 					try
 					{
-						player.play(questionNumber, QCMService.TIME);
+						ArrayList<String> results = (ArrayList<String>) player.play(7, QCMService.TIME);//change after
+						if(results==null)
+							badQuestion.incrementAndGet();
+						else
+						{
+							Question question = parser.getQuestion(7);//Change after
+							if(XMLParser.SINGLE.equals(question.getType()))
+							{
+								SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
+								if(sQuestion.getAnswer().equals(results.get(0)))
+								{
+									//TODO Annuler tout le choix chez tous les autres
+									Log.d("TAG", "Simple Choice good question");
+								}
+								else
+									badQuestion.incrementAndGet();
+							}
+							else if(XMLParser.MULTIPLE.equals(question.getType()))
+							{
+								MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
+								if(mQuestion.getAnswers().equals(results))
+								{
+									//TODO Annuler tout le choix chez tous les autres
+									Log.d("TAG", "Multiple Choice good question");
+								}
+								else 
+									badQuestion.incrementAndGet();
+							}							
+						}
+						
+						//Checker si tout le monde a répondu faux 
+						if(mPlayers.size() == badQuestion.get())
+						{
+							//Lancer l'ecan qui dit que personne n'a gagné
+						}
+							
 					}
 					catch (RemoteException e)
 					{
 						mPlayers.remove(player);
 						managePlayer(((Player) i).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
 						mPlayers.remove(i);
+						e.printStackTrace();
+					} catch (XmlPullParserException e)
+					{
+						e.printStackTrace();
+					} catch (IOException e)
+					{
 						e.printStackTrace();
 					}
 					
@@ -250,7 +299,7 @@ public class QCMService extends Service
 			@Override
 			public void onServiceDisconnected(ComponentName name)
 			{
-				mPlayers.remove(uri);
+//				mPlayers.remove(uri);
 				managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER); //FIXME Null pointer exception on disconnect
 //				mPlayersNickname.remove(uri);
 				mPlayers.remove(uri);

@@ -49,7 +49,7 @@ public class XMLParser
 				if(QUESTION.equals(model.getName()) && String.valueOf(questionNumber).equals(model.getAttributeValue(0)) && !rightQuestion)
 				{
 					rightQuestion = true;
-					if(SINGLE.equals(model.getAttributeValue(0)))
+					if(SINGLE.equals(model.getAttributeValue(1)))
 						type = SINGLE;
 							
 					else

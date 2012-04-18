@@ -70,7 +70,7 @@
         <value good="true">4G</value>
         <value >5G</value>
     </question>
-    <question id="10" >
+    <question id="10" type="radio">
         <message>Les applications publiées : </message>
         <value >sont toutes validés par Google</value>
         <value >sont publiées par Google uniquement</value>
