@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -53,6 +53,8 @@ public class QCMService extends Service
 	private Mode mState = Mode.STOP;
 	private boolean gameStart = false;
 	private RemoteQCM master = null;
+	String winner = null;
+	private static Object	sLock		= new Object();
 
 	private enum Mode 
 	{
@@ -176,7 +178,7 @@ public class QCMService extends Service
 						}
 						catch (RemoteException e)
 						{
-							mPlayers.remove(remotePlayer);
+//							mPlayers.remove(remotePlayer);
 							managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
 							mPlayers.remove(player);
 							e.printStackTrace();
@@ -206,7 +208,7 @@ public class QCMService extends Service
 		Collections.shuffle(questionList);
 		final int questionNumber = questionList.get(0);
 		Intent intent = new Intent(this, QuestionActivity.class);
-		intent.putExtra("questionNumber", 7); //change after
+		intent.putExtra("questionNumber", questionNumber); 
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
 		
@@ -216,7 +218,7 @@ public class QCMService extends Service
 		final AtomicInteger badQuestion = new AtomicInteger(0);
 		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 		{
-			final RemoteQCM player = i.next().getPlayer();
+			final Player player = i.next();
 			new Thread( new Runnable()
 			{
 				@Override
@@ -225,19 +227,21 @@ public class QCMService extends Service
 					//optimiser en mettant dans une nouvelle method
 					try
 					{
-						ArrayList<String> results = (ArrayList<String>) player.play(7, QCMService.TIME);//change after
+						ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMService.TIME);
 						if(results==null)
 							badQuestion.incrementAndGet();
 						else
 						{
-							Question question = parser.getQuestion(7);//Change after
+							Question question = parser.getQuestion(questionNumber);
 							if(XMLParser.SINGLE.equals(question.getType()))
 							{
 								SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
 								if(sQuestion.getAnswer().equals(results.get(0)))
 								{
+									setWinner(player.getNickname());
 									//TODO Annuler tout le choix chez tous les autres
 									Log.d("TAG", "Simple Choice good question");
+									restart();
 								}
 								else
 									badQuestion.incrementAndGet();
@@ -249,6 +253,7 @@ public class QCMService extends Service
 								{
 									//TODO Annuler tout le choix chez tous les autres
 									Log.d("TAG", "Multiple Choice good question");
+									restart();
 								}
 								else 
 									badQuestion.incrementAndGet();
@@ -259,12 +264,13 @@ public class QCMService extends Service
 						if(mPlayers.size() == badQuestion.get())
 						{
 							//Lancer l'ecan qui dit que personne n'a gagné
+							restart();
 						}
 							
 					}
 					catch (RemoteException e)
 					{
-						mPlayers.remove(player);
+//						mPlayers.remove(player);
 						managePlayer(((Player) i).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
 						mPlayers.remove(i);
 						e.printStackTrace();
@@ -279,6 +285,8 @@ public class QCMService extends Service
 				}
 			}).start();
 		}
+		stop();
+		Log.d("TAG", "Multiple Choice good question");
 		
 	}
 	
@@ -379,7 +387,7 @@ public class QCMService extends Service
 						@Override
 						public void onError(Throwable e)
 						{
-							mPlayers.remove(uri);
+//							mPlayers.remove(uri);
 							mAndroids.remove(info);
 							managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
 //							mPlayersNickname.remove(uri);
@@ -429,43 +437,77 @@ public class QCMService extends Service
 	{
 		return null;
 	}
-	
-//	public void getRandom()
-//	{
-//		int[] values = {1,2,3,4,5,6,7,8,9,10}; 
-//		Collections.shuffle(values);
-//	}
-//	
+
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-//		Log.d("service","Service onDestroy");
-//		for (final RemoteQCM i:mPlayers.values())
-//		{
-//			new AsyncTask<Void, Void, Void>()
-//			{
-//				@Override
-//				protected Void doInBackground(Void... params)
-//				{
-//					try
-//					{
-//						i.exit();
-//					}
-//					catch (RemoteException e)
-//					{
-//						// Ignore
-//					}
-//					return null;
-//				}
-//			}.execute();
-//		}
-//		if (mAndroids != null)
-//		{
-//			mAndroids.close();
-//		}
-//		mManager.close();
-//		sMe=null;
+		Log.d("service","Service onDestroy");
+		for (final Player i:mPlayers.values())
+		{
+			new AsyncTask<Void, Void, Void>()
+			{
+				@Override
+				protected Void doInBackground(Void... params)
+				{
+					try
+					{
+						i.getPlayer().exit();
+					}
+					catch (RemoteException e)
+					{
+						// Ignore
+					}
+					return null;
+				}
+			}.execute();
+		}
+		if (mAndroids != null)
+		{
+			mAndroids.close();
+		}
+		mManager.close();
+		sMe=null;
+		mPlayers = null;
+	}
+	
+	public synchronized String getWinner()
+	{
+		return winner;
+	}
+
+	public synchronized void setWinner(String winner)
+	{
+		this.winner = winner;
+	}
+	
+	private void stop()
+	{
+		synchronized (sLock)
+		{
+			try
+			{
+				sLock.wait();
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	private void restart()
+	{
+		synchronized (sLock)
+		{
+			sLock.notify();
+		}
+	}
+	private void stopAllPlayer()
+	{
+		if(getWinner()==null)
+		{
+			
+		}
+		
 	}
 
 }

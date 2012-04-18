@@ -151,6 +151,16 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	{
 		postStartGame(true);
 	}
-
-
+	public void exit() throws RemoteException
+	{
+		new Thread()
+		{
+			@Override
+			public void run()
+			{
+				try { Thread.sleep(200); } catch (Throwable e) {}
+				System.exit(0);
+			}
+		}.start();
+	}
 }
