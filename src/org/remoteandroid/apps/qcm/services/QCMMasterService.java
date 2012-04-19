@@ -18,9 +18,9 @@ import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.SimpleChoiceQuestion;
 import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
-import org.remoteandroid.apps.qcm.ui.QCMRemoteActivity;
-import org.remoteandroid.apps.qcm.ui.QuestionActivity;
-import org.remoteandroid.apps.qcm.ui.RemoteResult;
+import org.remoteandroid.apps.qcm.ui.master.QCMMasterActivity;
+import org.remoteandroid.apps.qcm.ui.master.QuestionActivity;
+import org.remoteandroid.apps.qcm.ui.master.MasterResult;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Service;
@@ -35,14 +35,14 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-public class QCMService extends Service
+public class QCMMasterService extends Service
 {
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
 //	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
 	public static final int TIME = 10;
 	ListRemoteAndroidInfo mAndroids;
-	public static QCMService sMe;
+	public static QCMMasterService sMe;
 
 	public static RemoteAndroidManager mManager;
 
@@ -70,6 +70,26 @@ public class QCMService extends Service
 		if (sMe!=null) return;
 		Log.d("service","Service onCreate");
 		sMe=this;
+		mAndroids = RemoteAndroidManager.newDiscoveredAndroid(this,
+				new ListRemoteAndroidInfo.DiscoverListener()
+		{
+			@Override
+			public void onDiscover(final RemoteAndroidInfo remoteAndroidInfo, boolean replace)
+			{
+				QCMMasterService.this.onDiscover(remoteAndroidInfo,replace);
+			}
+
+			@Override
+			public void onDiscoverStart()
+			{
+			}
+
+			@Override
+			public void onDiscoverStop()
+			{
+			}
+		});
+
 		RemoteAndroidManager.bindManager(this, new RemoteAndroidManager.ManagerListener()
 		{
 			
@@ -84,25 +104,7 @@ public class QCMService extends Service
 			{
 				// TODO Auto-generated method stub
 				mManager=manager;
-				mAndroids = mManager.newDiscoveredAndroid(new ListRemoteAndroidInfo.DiscoverListener()
-				{
-					@Override
-					public void onDiscover(final RemoteAndroidInfo remoteAndroidInfo, boolean replace)
-					{
-						QCMService.this.onDiscover(remoteAndroidInfo,replace);
-					}
-
-					@Override
-					public void onDiscoverStart()
-					{
-					}
-
-					@Override
-					public void onDiscoverStop()
-					{
-					}
-				});
-				
+								
 			}
 		});
 	
@@ -164,7 +166,7 @@ public class QCMService extends Service
 							{
 //								mPlayersNickname.put(uri, nickname);
 								player.setNickname(nickname);
-								managePlayer(nickname, QCMRemoteActivity.ADD_PLAYER);
+								managePlayer(nickname, QCMMasterActivity.ADD_PLAYER);
 //								int number = mPlayersNumbers.get();
 								master=remotePlayer;
 								if(remotePlayer.starPlayRequest(mPlayersNumbers.incrementAndGet()))
@@ -180,7 +182,7 @@ public class QCMService extends Service
 						catch (RemoteException e)
 						{
 //							mPlayers.remove(remotePlayer);
-							managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
+							managePlayer(mPlayers.get(uri).getNickname(), QCMMasterActivity.REMOVE_PLAYER);
 							mPlayers.remove(player);
 							e.printStackTrace();
 							//Gerer l'echec de la souscription
@@ -193,7 +195,7 @@ public class QCMService extends Service
 	
 	public void managePlayer(String nickname, boolean manageType)
 	{
-		Intent intent = new Intent(QCMRemoteActivity.REGISTER);
+		Intent intent = new Intent(QCMMasterActivity.REGISTER);
 		intent.putExtra("nickname", nickname);
 		intent.putExtra("type", manageType);
 		sendBroadcast(intent);
@@ -230,7 +232,7 @@ public class QCMService extends Service
 						//optimiser en mettant dans une nouvelle method
 						try
 						{
-							ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMService.TIME);
+							ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMMasterService.TIME);
 							if(results==null)
 								badQuestion.incrementAndGet();
 							else
@@ -277,7 +279,7 @@ public class QCMService extends Service
 						catch (RemoteException e)
 						{
 //							mPlayers.remove(player);
-							managePlayer(((Player) i).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
+							managePlayer(((Player) i).getNickname(), QCMMasterActivity.REMOVE_PLAYER);
 							mPlayers.remove(i);
 							e.printStackTrace();
 						} catch (XmlPullParserException e)
@@ -413,7 +415,7 @@ public class QCMService extends Service
 			public void onServiceDisconnected(ComponentName name)
 			{
 //				mPlayers.remove(uri);
-				managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER); //FIXME Null pointer exception on disconnect
+				managePlayer(mPlayers.get(uri).getNickname(), QCMMasterActivity.REMOVE_PLAYER); //FIXME Null pointer exception on disconnect
 //				mPlayersNickname.remove(uri);
 				mPlayers.remove(uri);
 				//TODO Send broadcast to remove on the liste
@@ -421,9 +423,9 @@ public class QCMService extends Service
 				mAndroids.remove(info);
 				if(block)
 				{
-					synchronized (QCMService.this)
+					synchronized (QCMMasterService.this)
 					{
-						QCMService.this.notify();
+						QCMMasterService.this.notify();
 					}
 				}
 			}
@@ -450,7 +452,7 @@ public class QCMService extends Service
 						{
 							if(status == 2)
 							{
-								Toast.makeText(QCMService.this, "Device "+rA.getInfos().getName()+ " accept only applications from market.", Toast.LENGTH_SHORT).show();
+								Toast.makeText(QCMMasterService.this, "Device "+rA.getInfos().getName()+ " accept only applications from market.", Toast.LENGTH_SHORT).show();
 							}
 							else if(status == -1)
 							{
@@ -478,9 +480,9 @@ public class QCMService extends Service
 										if(block)
 										{
 											result.rc = true;
-											synchronized (QCMService.this)
+											synchronized (QCMMasterService.this)
 											{
-												QCMService.this.notify();
+												QCMMasterService.this.notify();
 											}
 										}
 									}
@@ -494,7 +496,7 @@ public class QCMService extends Service
 						{
 //							mPlayers.remove(uri);
 							mAndroids.remove(info);
-							managePlayer(mPlayers.get(uri).getNickname(), QCMRemoteActivity.REMOVE_PLAYER);
+							managePlayer(mPlayers.get(uri).getNickname(), QCMMasterActivity.REMOVE_PLAYER);
 //							mPlayersNickname.remove(uri);
 							mPlayers.remove(uri);
 							
@@ -610,14 +612,14 @@ public class QCMService extends Service
 	{
 		if(manage)
 		{
-			startActivity(new Intent(QCMService.this, RemoteResult.class)
+			startActivity(new Intent(QCMMasterService.this, MasterResult.class)
 				.putExtra("winner", winner)
 				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 			sendBroadcast(new Intent(QuestionActivity.FINISH_QUESTIONACTIVITY));
 		}
 		else 
 		{
-			sendBroadcast(new Intent(RemoteResult.FINISH));
+			sendBroadcast(new Intent(MasterResult.FINISH));
 			
 		}
 		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)

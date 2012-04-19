@@ -1,4 +1,4 @@
-package org.remoteandroid.apps.qcm.ui;
+package org.remoteandroid.apps.qcm.ui.master;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +9,7 @@ import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.XMLParser;
-import org.remoteandroid.apps.qcm.services.QCMService;
+import org.remoteandroid.apps.qcm.services.QCMMasterService;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Dialog;
@@ -32,7 +32,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-public class QCMRemoteActivity extends SherlockActivity implements OnClickListener
+public class QCMMasterActivity extends SherlockActivity implements OnClickListener
 {
 	public static final String REGISTER = "org.remoteandroid.apps.qcm.REGISTER";
 	public static final boolean ADD_PLAYER = true;
@@ -77,9 +77,9 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		mQrcodeButton.setImageBitmap(getOwnQRCodeFromRA(MINI));
 		master_name = (TextView)findViewById(R.id.master_game);
 		list = (ListView) findViewById(R.id.listView);
-		mAdapter = new ArrayAdapter<String>(QCMRemoteActivity.this, android.R.layout.simple_list_item_1,android.R.id.text1, players );
+		mAdapter = new ArrayAdapter<String>(QCMMasterActivity.this, android.R.layout.simple_list_item_1,android.R.id.text1, players );
 		list.setAdapter(mAdapter);
-		startService(new Intent(this, QCMService.class));
+		startService(new Intent(this, QCMMasterService.class));
 		resources = getResources();
 	
 	}
@@ -153,9 +153,9 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 	{
 		if (view == mQrcodeButton)
 		{
-			final Dialog dialog = new Dialog(QCMRemoteActivity.this);
+			final Dialog dialog = new Dialog(QCMMasterActivity.this);
 			dialog.setContentView(R.layout.qrcode_dialog);
-			dialog.setTitle(QCMRemoteActivity.this.getResources().getString(
+			dialog.setTitle(QCMMasterActivity.this.getResources().getString(
 				R.string.title_qrcode_dialog));
 			ImageView image = (ImageView) dialog.findViewById(R.id.qrcode_dialog_image);
 			image.setImageBitmap(getOwnQRCodeFromRA(MAXI));
@@ -176,7 +176,7 @@ public class QCMRemoteActivity extends SherlockActivity implements OnClickListen
 		else if(view == mStartGame)
 		{
 			master_name.setText(BORNE);
-			startService(new Intent(QCMService.REMOTE_START_GAME));
+			startService(new Intent(QCMMasterService.REMOTE_START_GAME));
 		}
 	}
 }

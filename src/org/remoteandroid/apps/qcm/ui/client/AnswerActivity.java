@@ -1,4 +1,4 @@
-package org.remoteandroid.apps.qcm.ui;
+package org.remoteandroid.apps.qcm.ui.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.SimpleChoiceQuestion;
 import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCMImpl;
-import org.remoteandroid.apps.qcm.services.QCMService;
+import org.remoteandroid.apps.qcm.services.QCMMasterService;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
@@ -95,7 +95,7 @@ public class AnswerActivity extends Activity implements OnClickListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		mTimeBar.setMax(QCMService.TIME*1000);
+		mTimeBar.setMax(QCMMasterService.TIME*1000);
 		
 //		answerView.
 		startUpdateTimeBar();
@@ -123,7 +123,7 @@ public class AnswerActivity extends Activity implements OnClickListener
 						return null;
 					progresStatus = (int) (((System.currentTimeMillis() - startTime)));
 					publishProgress(progresStatus);
-				} while (progresStatus < QCMService.TIME * 1000);
+				} while (progresStatus < QCMMasterService.TIME * 1000);
 				return null;
 			}
 

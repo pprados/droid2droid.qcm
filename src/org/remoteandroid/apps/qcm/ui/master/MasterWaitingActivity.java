@@ -1,4 +1,4 @@
-package org.remoteandroid.apps.qcm.ui;
+package org.remoteandroid.apps.qcm.ui.master;
 
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.remote.RemoteQCMImpl;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class MasterActivity extends Activity implements OnClickListener
+public class MasterWaitingActivity extends Activity implements OnClickListener
 {
 	Button playButton;
 	@Override

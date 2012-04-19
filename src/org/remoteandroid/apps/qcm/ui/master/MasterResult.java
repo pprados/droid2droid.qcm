@@ -1,4 +1,4 @@
-package org.remoteandroid.apps.qcm.ui;
+package org.remoteandroid.apps.qcm.ui.master;
 
 import org.remoteandroid.apps.qcm.R;
 
@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-public class RemoteResult extends SherlockActivity
+public class MasterResult extends SherlockActivity
 {
 	private ImageView mImage;
 	private TextView mWinner;

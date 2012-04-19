@@ -1,4 +1,4 @@
-package org.remoteandroid.apps.qcm.ui;
+package org.remoteandroid.apps.qcm.ui.master;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.XMLParser;
-import org.remoteandroid.apps.qcm.services.QCMService;
+import org.remoteandroid.apps.qcm.services.QCMMasterService;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
@@ -39,7 +39,7 @@ public class QuestionActivity extends Activity
 		questionMessage = (TextView) findViewById(R.id.question);
 		listChoice = (TextView) findViewById(R.id.answer_list);
 		int questionNumber = getIntent().getIntExtra("questionNumber", 0);
-		mTimeBar.setMax(QCMService.TIME*1000);
+		mTimeBar.setMax(QCMMasterService.TIME*1000);
 		startUpdateTimeBar();
 		try
 		{
@@ -85,7 +85,7 @@ public class QuestionActivity extends Activity
 						return null;
 					progresStatus = (int) (((System.currentTimeMillis() - startTime)));
 					publishProgress(progresStatus);
-				} while (progresStatus < QCMService.TIME * 1000);
+				} while (progresStatus < QCMMasterService.TIME * 1000);
 				return null;
 			}
 

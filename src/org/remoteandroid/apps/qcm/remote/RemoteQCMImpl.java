@@ -2,11 +2,11 @@ package org.remoteandroid.apps.qcm.remote;
 
 import java.util.List;
 
-import org.remoteandroid.apps.qcm.ui.AnswerActivity;
-import org.remoteandroid.apps.qcm.ui.ClientResult;
-import org.remoteandroid.apps.qcm.ui.MasterActivity;
-import org.remoteandroid.apps.qcm.ui.SuscribeActivity;
-import org.remoteandroid.apps.qcm.ui.WaitingActivity;
+import org.remoteandroid.apps.qcm.ui.client.AnswerActivity;
+import org.remoteandroid.apps.qcm.ui.client.ClientResult;
+import org.remoteandroid.apps.qcm.ui.client.SuscribeActivity;
+import org.remoteandroid.apps.qcm.ui.client.WaitingActivity;
+import org.remoteandroid.apps.qcm.ui.master.MasterWaitingActivity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -103,7 +103,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	{
 		if(number==1)
 		{
-			postStartActivity(new Intent(this.mContext, MasterActivity.class));
+			postStartActivity(new Intent(this.mContext, MasterWaitingActivity.class));
 			return getStartGame();
 		}
 		else 

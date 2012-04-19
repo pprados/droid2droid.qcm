@@ -4,11 +4,14 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="14"/>
+    <uses-sdk
+        android:minSdkVersion="4"
+        android:targetSdkVersion="14" />
+
     <permission
+        android:name="org.remoteandroid.permission.DISCOVER"
         android:description="@string/permission_discover_desc"
         android:label="@string/permission_discover_label"
-        android:name="org.remoteandroid.permission.DISCOVER"
         android:permissionGroup="android.permission-group.NETWORK"
         android:protectionLevel="normal" />
 
@@ -19,68 +22,77 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="org.remoteandroid.permission.contentprovider.QRCODE"/>
+    <uses-permission android:name="org.remoteandroid.permission.contentprovider.QRCODE" />
 
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name=".ui.SuscribeActivity"
-            android:label="@string/app_name" 
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
-<!--            	<intent-filter> -->
-<!--                 <action android:name="android.intent.action.MAIN" /> -->
-<!--                 <category android:name="android.intent.category.LAUNCHER" /> -->
-<!--             </intent-filter> -->
-        </activity>
-        <activity android:name=".ui.QCMRemoteActivity"
+            android:name=".ui.client.SuscribeActivity"
+            android:configChanges="orientation"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
+            android:theme="@style/Theme.Sherlock.Light" >
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name=".ui.master.QCMMasterActivity"
+            android:configChanges="orientation"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Sherlock.Light" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.MasterActivity"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
-            
+        <activity
+            android:name=".ui.master.MasterWaitingActivity"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
         </activity>
-         <activity android:name=".ui.WaitingActivity"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
-            
+        <activity
+            android:name=".ui.client.WaitingActivity"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
         </activity>
-        <activity android:name=".ui.QuestionActivity"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
-            
+        <activity
+            android:name=".ui.master.QuestionActivity"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
         </activity>
-        <activity android:name=".ui.AnswerActivity"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
-            
+        <activity
+            android:name=".ui.client.AnswerActivity"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
         </activity>
-        <activity android:name=".ui.ClientResult"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
-            
+        <activity
+            android:name=".ui.client.ClientResult"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
         </activity>
-        <activity android:name=".ui.RemoteResult"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:configChanges="orientation">
-            
+        <activity
+            android:name=".ui.master.MasterResult"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
         </activity>
-        <service android:name=".services.QCMService">
-            <intent-filter >
-                <action android:name="org.remoteandroid.apps.qcm.REMOTE_START_GAME"/>
+
+        <service android:name=".services.QCMMasterService" >
+            <intent-filter>
+                <action android:name="org.remoteandroid.apps.qcm.REMOTE_START_GAME" />
             </intent-filter>
         </service>
-        <service android:name=".remote.RemoteQCMService">
-            <intent-filter >
-                <action android:name="org.remoteandroid.apps.QCM.RemoteService"/>
+        <service android:name=".remote.RemoteQCMService" >
+            <intent-filter>
+                <action android:name="org.remoteandroid.apps.QCM.RemoteService" />
+            </intent-filter>
+        </service>
+        <service android:name=".services.QCMClientService" >
+            <intent-filter>
+                <action android:name="org.remoteandroid.apps.QCM.RemoteService" />
             </intent-filter>
         </service>
     </application>

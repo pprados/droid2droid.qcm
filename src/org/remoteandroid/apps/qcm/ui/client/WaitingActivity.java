@@ -1,4 +1,4 @@
-package org.remoteandroid.apps.qcm.ui;
+package org.remoteandroid.apps.qcm.ui.client;
 
 import org.remoteandroid.apps.qcm.R;
 
