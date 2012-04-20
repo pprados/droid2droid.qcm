@@ -7,10 +7,7 @@ import java.util.List;
 
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
-import org.remoteandroid.apps.qcm.model.Question;
-import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
-import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -38,6 +35,8 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	public static final boolean ADD_PLAYER = true;
 	public static final boolean REMOVE_PLAYER = false;
 	
+	public static final int MANAGE_PLAYER = 0;
+	
 	private static final String BORNE = "Borne" ;
 	
 	private static final int MINI = 200;
@@ -53,12 +52,14 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	ArrayAdapter<String> mAdapter;
 	private TextView master_name;
 	private Resources resources;
+	
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
 		registerReceiver(mReceiver, new IntentFilter(REGISTER));
+		startService(new Intent(QCMMasterService.REMOTE_START_GAME));
 	}
 
 	@Override
@@ -79,7 +80,8 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 		list = (ListView) findViewById(R.id.listView);
 		mAdapter = new ArrayAdapter<String>(QCMMasterActivity.this, android.R.layout.simple_list_item_1,android.R.id.text1, players );
 		list.setAdapter(mAdapter);
-		startService(new Intent(this, QCMMasterService.class));
+		Intent intent = new Intent(this, QCMMasterService.class);
+		startService(intent);
 		resources = getResources();
 	
 	}
@@ -95,27 +97,18 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	{
 		public void onReceive(android.content.Context context, android.content.Intent intent)
 		{
-			String nickname = intent.getExtras().getString("nickname");
-			boolean type = intent.getExtras().getBoolean("type");
-			if(ADD_PLAYER==type)
-				players.add(nickname);
-			else
-				players.remove(nickname);
-			
-			mAdapter.notifyDataSetChanged();
+			players.addAll(intent.getStringArrayListExtra("playersNickname"));
 			if(players.size() >= 1)
 			{
 				master_name.setText(players.get(0));
 				mStartGame.setEnabled(true);
 			}
-				
 			else
 			{
 				master_name.setText(resources.getText(R.string.no_master_game));
 				mStartGame.setEnabled(false);
 			}
-				
-			
+			mAdapter.notifyDataSetChanged();
 		};
 	};
 
@@ -179,4 +172,5 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 			startService(new Intent(QCMMasterService.REMOTE_START_GAME));
 		}
 	}
+	
 }

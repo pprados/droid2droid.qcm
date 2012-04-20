@@ -32,12 +32,8 @@
             android:configChanges="orientation"
             android:label="@string/app_name"
             android:theme="@style/Theme.Sherlock.Light" >
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
         </activity>
+        
         <activity
             android:name=".ui.master.QCMMasterActivity"
             android:configChanges="orientation"
@@ -50,7 +46,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.master.MasterWaitingActivity"
+            android:name=".ui.client.ClientStartGame"
             android:configChanges="orientation"
             android:theme="@style/Theme.Sherlock.Light" >
         </activity>
@@ -82,7 +78,9 @@
 
         <service android:name=".services.QCMMasterService" >
             <intent-filter>
+                <action android:name="org.remoteandroid.apps.qcm.START_SERVICE" />
                 <action android:name="org.remoteandroid.apps.qcm.REMOTE_START_GAME" />
+                <action android:name="org.remoteandroid.apps.qcm.SEND_PLAYER_LIST"/>
             </intent-filter>
         </service>
         <service android:name=".remote.RemoteQCMService" >
@@ -91,9 +89,6 @@
             </intent-filter>
         </service>
         <service android:name=".services.QCMClientService" >
-            <intent-filter>
-                <action android:name="org.remoteandroid.apps.QCM.RemoteService" />
-            </intent-filter>
         </service>
     </application>
 

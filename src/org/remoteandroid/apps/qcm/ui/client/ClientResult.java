@@ -1,28 +1,18 @@
 package org.remoteandroid.apps.qcm.ui.client;
 
 import org.remoteandroid.apps.qcm.R;
+import org.remoteandroid.apps.qcm.services.AbstractGameScreen;
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-
-public class ClientResult extends SherlockActivity
+public class ClientResult extends AbstractGameScreen
 {
 	private ImageView mImage;
 	private TextView mWinner, mScore;
 	public static final String FINISH = "org.remoteandroid.apps.qcm.FINISH";
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		registerReceiver(mReceiver, new IntentFilter(FINISH));
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -48,21 +38,11 @@ public class ClientResult extends SherlockActivity
 			
 		
 	}
-	
-	private BroadcastReceiver mReceiver = new BroadcastReceiver()
-	{
-		public void onReceive(android.content.Context context, android.content.Intent intent)
-		{
-			finish();
-		};
-	};
-	
 	@Override
-	protected void onPause()
+	public void onReceiveForService(Bundle resultData)
 	{
-		super.onPause();
-		unregisterReceiver(mReceiver);
+		// TODO Auto-generated method stub
+		
 	}
-
-
+	
 }

@@ -1,11 +1,11 @@
 package org.remoteandroid.apps.qcm.ui.client;
 
 import org.remoteandroid.apps.qcm.R;
+import org.remoteandroid.apps.qcm.services.AbstractGameScreen;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-public class WaitingActivity extends Activity
+public class WaitingActivity extends AbstractGameScreen
 {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -17,5 +17,10 @@ public class WaitingActivity extends Activity
 	public void onBackPressed()
 	{
 	}
-
+	@Override
+	public void onReceiveForService(Bundle resultData)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

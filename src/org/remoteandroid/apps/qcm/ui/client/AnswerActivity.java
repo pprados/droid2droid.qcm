@@ -10,12 +10,10 @@ import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.SimpleChoiceQuestion;
 import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCMImpl;
+import org.remoteandroid.apps.qcm.services.AbstractGameScreen;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -27,7 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-public class AnswerActivity extends Activity implements OnClickListener
+public class AnswerActivity extends AbstractGameScreen implements OnClickListener
 {
 	public static final String FINISH_RESPONSEACTIVITY = "org.remoteandroid.apps.qcm.FINISH_RESPONSEACTIVITY";
 	private AsyncTask<?, ?, ?>	mAsyncTask;
@@ -39,11 +37,6 @@ public class AnswerActivity extends Activity implements OnClickListener
 	CheckBox [] cb;
 	private List<String> answers;
 	private Button selectAnswer;
-	protected void onResume()
-	{
-		super.onResume();
-		registerReceiver(mReceiver, new IntentFilter(FINISH_RESPONSEACTIVITY));
-	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -174,12 +167,12 @@ public class AnswerActivity extends Activity implements OnClickListener
 		}
 		
 	}
-	private BroadcastReceiver mReceiver = new BroadcastReceiver()
+
+	@Override
+	public void onReceiveForService(Bundle resultData)
 	{
-		public void onReceive(android.content.Context context, android.content.Intent intent)
-		{
-			finish();
-		};
-	};
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

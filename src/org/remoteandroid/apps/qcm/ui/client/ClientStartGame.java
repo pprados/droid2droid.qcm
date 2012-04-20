@@ -1,15 +1,15 @@
-package org.remoteandroid.apps.qcm.ui.master;
+package org.remoteandroid.apps.qcm.ui.client;
 
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.remote.RemoteQCMImpl;
+import org.remoteandroid.apps.qcm.services.AbstractGameScreen;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class MasterWaitingActivity extends Activity implements OnClickListener
+public class ClientStartGame extends AbstractGameScreen implements OnClickListener
 {
 	Button playButton;
 	@Override
@@ -33,5 +33,9 @@ public class MasterWaitingActivity extends Activity implements OnClickListener
 	public void onBackPressed()
 	{
 	}
-
+	@Override
+	public void onReceiveForService(Bundle resultData)
+	{
+		// TODO Auto-generated method stub
+	}
 }

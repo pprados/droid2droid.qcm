@@ -6,29 +6,26 @@ import java.util.ArrayList;
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.XMLParser;
+import org.remoteandroid.apps.qcm.services.AbstractGameScreen;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class QuestionActivity extends Activity
+public class QuestionActivity extends AbstractGameScreen
 {
 	public static final String FINISH_QUESTIONACTIVITY = "org.remoteandroid.apps.qcm.FINISH_QUESTIONACTIVITY";
 	private AsyncTask<?, ?, ?>	mAsyncTask;
 	private long  startTime;
 	private ProgressBar mTimeBar;
 	private TextView questionMessage, listChoice;
-	protected void onResume()
-	{
-		super.onResume();
-		registerReceiver(mReceiver, new IntentFilter(FINISH_QUESTIONACTIVITY));
-	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -102,19 +99,16 @@ public class QuestionActivity extends Activity
 			};
 		}.execute();
 	}
-	
-	private BroadcastReceiver mReceiver = new BroadcastReceiver()
-	{
-		public void onReceive(android.content.Context context, android.content.Intent intent)
-		{
-			finish();
-		};
-	};
-	
 	@Override
 	protected void onDestroy()
 	{
 		super.onDestroy();
 		mAsyncTask.cancel(true);
+	}
+	@Override
+	public void onReceiveForService(Bundle resultData)
+	{
+		finish();
+		
 	}
 }
