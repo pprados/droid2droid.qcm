@@ -6,5 +6,5 @@ interface RemoteQCM
 	void leaveMaster();
 	List<String> play(int question, long startTime);	
 	void exit();
-	void startAndStopResultScreen(String winner, int score, boolean manage);
+	void startAndStopResultScreen(String winner,String player, int score, boolean manage);
 }

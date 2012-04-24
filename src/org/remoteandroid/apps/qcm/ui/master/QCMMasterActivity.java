@@ -97,6 +97,7 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	{
 		public void onReceive(android.content.Context context, android.content.Intent intent)
 		{
+			players.clear();
 			players.addAll(intent.getStringArrayListExtra("playersNickname"));
 			if(players.size() >= 1)
 			{

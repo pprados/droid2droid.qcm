@@ -23,10 +23,14 @@ public class ClientResult extends AbstractGameScreen
 		mScore = (TextView) findViewById(R.id.playerscore);
 		Intent intent = getIntent();
 		String winner = intent.getExtras().getString("winner");
+		String player = intent.getExtras().getString("player");
 		int score = intent.getExtras().getInt("score");
 		if(winner!=null)
 		{
-			mImage.setImageResource(R.drawable.win);
+			if(winner.equals(player))
+				mImage.setImageResource(R.drawable.win);
+			else
+				mImage.setImageResource(R.drawable.loose);
 			mWinner.setText(winner);
 		}
 		else 
@@ -41,7 +45,7 @@ public class ClientResult extends AbstractGameScreen
 	@Override
 	public void onReceiveForService(Bundle resultData)
 	{
-		// TODO Auto-generated method stub
+		finish();
 		
 	}
 	

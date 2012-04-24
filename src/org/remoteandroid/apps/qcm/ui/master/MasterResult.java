@@ -37,7 +37,6 @@ public class MasterResult extends AbstractGameScreen
 	public void onReceiveForService(Bundle resultData)
 	{
 		finish();
-		
 	}
 	
 }

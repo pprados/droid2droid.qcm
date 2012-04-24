@@ -42,7 +42,7 @@ public class QCMMasterService extends Service
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
 //	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
-	public static final int TIME = 10;
+	public static final int TIME = 60;
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMMasterService sMe;
 
@@ -202,7 +202,8 @@ public class QCMMasterService extends Service
 		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 		{
 			final Player player = i.next();
-			playersNickname.add(player.getNickname());
+			if(player.getNickname()!=null)
+				playersNickname.add(player.getNickname());
 		}
 		Intent intent = new Intent(QCMMasterActivity.REGISTER);
 		intent.putExtra("playersNickname", playersNickname);
@@ -528,10 +529,11 @@ public class QCMMasterService extends Service
 	}
 	private void startAndStopResultScreen(final String winner, final boolean manage)
 	{
-		sendBroadcast(new Intent(AbstractGameScreen.FINISH_ACTIVITY));
-			startActivity(new Intent(this, MasterResult.class)
+		sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
+		startActivity(new Intent(this, MasterResult.class)
 				.putExtra("winner", winner)
 				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+		//Put other player score here
 			
 		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 		{
@@ -543,7 +545,7 @@ public class QCMMasterService extends Service
 				{
 					try
 					{
-						player.getPlayer().startAndStopResultScreen(winner, player.getScore(), manage);
+						player.getPlayer().startAndStopResultScreen(winner, player.getNickname(), player.getScore(), manage);
 					} catch (RemoteException e)
 					{
 						e.printStackTrace();

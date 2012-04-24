@@ -166,7 +166,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 	}
 
 	@Override
-	public void startAndStopResultScreen(String winner, int score, boolean manage) throws RemoteException
+	public void startAndStopResultScreen(String winner,String player, int score, boolean manage) throws RemoteException
 	{
 		if(manage)
 		{
@@ -175,6 +175,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 			Intent intent = new Intent(mContext, ClientResult.class);
 			intent.putExtra("winner", winner);
 			intent.putExtra("score", score);
+			intent.putExtra("player", player);
 			postStartActivity(intent);
 		}
 		else 
