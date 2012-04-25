@@ -75,7 +75,16 @@
             android:configChanges="orientation"
             android:theme="@style/Theme.Sherlock.Light" >
         </activity>
-
+        <activity
+            android:name=".ui.client.WinnerRestartScreen"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
+        </activity>
+        <activity
+            android:name=".ui.client.WinnerStaticScreen"
+            android:configChanges="orientation"
+            android:theme="@style/Theme.Sherlock.Light" >
+        </activity>
         <service android:name=".services.QCMMasterService" >
             <intent-filter>
                 <action android:name="org.remoteandroid.apps.qcm.START_SERVICE" />

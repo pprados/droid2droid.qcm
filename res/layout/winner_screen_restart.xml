@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:layout_weight="3">
+        <ImageView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/cup"
+            android:contentDescription="@drawable/cup"/>
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/titleStyle"
+            android:text="Winner(s)"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+     <LinearLayout android:id="@+id/winner_layout" 
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        style="@style/titleStyle"
+        android:padding="10dip">
+        
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/winner" 
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_weight="3">
+        <Button android:id="@+id/restart_game"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="Restart the Game"/>
+    </LinearLayout>
+</LinearLayout>

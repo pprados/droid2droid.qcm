@@ -18,6 +18,7 @@ import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.SimpleChoiceQuestion;
 import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
+import org.remoteandroid.apps.qcm.ui.client.WinnerRestartScreen;
 import org.remoteandroid.apps.qcm.ui.master.MasterResult;
 import org.remoteandroid.apps.qcm.ui.master.QCMMasterActivity;
 import org.remoteandroid.apps.qcm.ui.master.QuestionActivity;
@@ -54,7 +55,7 @@ public class QCMMasterService extends Service
 	private AtomicInteger mPlayersNumbers = new AtomicInteger(0);
 
 	private Mode mState = Mode.STOP;
-	private boolean gameStart = false;
+//	private boolean gameStart = false;
 	private RemoteQCM master = null;
 	private int badQuestion = 0;
 	String winner = null;
@@ -146,7 +147,8 @@ public class QCMMasterService extends Service
 		mAndroids.add(remoteAndroidInfo);
 		if (replace)
 			return; // TODO Optimise la connexion
-		startConnection(remoteAndroidInfo);
+		if(mState == Mode.STOP)
+			startConnection(remoteAndroidInfo);
 
 	}
 	
@@ -173,9 +175,10 @@ public class QCMMasterService extends Service
 								player.setNickname(nickname);
 								managePlayer();
 //								int number = mPlayersNumbers.get();
-								setMaster(remotePlayer);
+								
 								if(remotePlayer.starPlayRequest(mPlayersNumbers.incrementAndGet()))
 								{
+									setMaster(remotePlayer);
 									startGame();
 								}
 								else
@@ -213,11 +216,12 @@ public class QCMMasterService extends Service
 	
 	public void startGame()
 	{
-		
+		mState = Mode.PLAY;
 		//Put the type of question
 		ArrayList<Integer> questionList = new ArrayList<Integer>();
 		for(int i= 1 ; i<= XMLParser.TOTAL_NUMBER_OF_QUESTION; i++)
 			questionList.add(i);
+		Collections.shuffle(questionList);
 		Collections.shuffle(questionList);
 		for(int num = 1; num<= XMLParser.MAX_QUESTION; num++ )
 		{
@@ -229,8 +233,6 @@ public class QCMMasterService extends Service
 
 			//Get a parser of question 
 			final XMLParser parser = new XMLParser(this);
-			//Atomic integer of number of player who have fail to th question 
-//			final AtomicInteger badQuestion1 = new AtomicInteger(0);
 			setBadQuestion(0);
 			try
 			{
@@ -325,6 +327,11 @@ public class QCMMasterService extends Service
 			}
 			startAndStopResultScreen(winner, false);
 			setWinner(null);
+			if(num==XMLParser.MAX_QUESTION)
+			{
+				mState = Mode.STOP;
+				restartGame();
+			}
 		}
 	}
 	
@@ -598,6 +605,55 @@ public class QCMMasterService extends Service
 			
 		else
 			sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
+	}
+	
+	public ArrayList<String> getWinnersInfos()
+	{
+		int max_score = 0;
+		ArrayList<String> players = new ArrayList<String>();
+		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
+		{
+			final Player player = i.next();
+			int score = player.getScore();
+			if(score>max_score)
+			{
+				max_score=score;
+				players.clear();
+				players.add(player.getNickname());
+			}
+			else if(score==max_score)
+				players.add(player.getNickname());
+			
+		}
+		return players;
+	}
+	public void restartGame()
+	{
+		ArrayList<String> winners = new ArrayList<String>();
+		winners = getWinnersInfos();
+		startActivity(new Intent(this, WinnerRestartScreen.class)
+		.putStringArrayListExtra("winners",winners)
+		.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
+		{
+			final Player player = i.next();
+			
+				try
+				{
+					if(master==player.getPlayer() && master!=null)
+					{
+						if(player.getPlayer().restart(winners))
+						{
+							startGame();
+						}
+					}
+					else
+						player.getPlayer().displayWinner(winners);
+				} catch (RemoteException e)
+				{
+					e.printStackTrace();
+				}
+		}
 	}
 		
 

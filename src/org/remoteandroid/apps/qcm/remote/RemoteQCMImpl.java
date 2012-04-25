@@ -1,5 +1,6 @@
 package org.remoteandroid.apps.qcm.remote;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.remoteandroid.apps.qcm.ui.client.AnswerActivity;
@@ -7,6 +8,8 @@ import org.remoteandroid.apps.qcm.ui.client.ClientResult;
 import org.remoteandroid.apps.qcm.ui.client.ClientStartGame;
 import org.remoteandroid.apps.qcm.ui.client.SuscribeActivity;
 import org.remoteandroid.apps.qcm.ui.client.WaitingActivity;
+import org.remoteandroid.apps.qcm.ui.client.WinnerRestartScreen;
+import org.remoteandroid.apps.qcm.ui.client.WinnerStaticScreen;
 
 import android.content.Context;
 import android.content.Intent;
@@ -182,6 +185,26 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 		{
 			mContext.sendBroadcast(new Intent(ClientResult.FINISH));
 		}
-
 	}
+
+	@Override
+	public void displayWinner(List<String> winners) throws RemoteException
+	{
+		Intent intent = new Intent(mContext, WinnerStaticScreen.class);
+		intent.putStringArrayListExtra("winners", (ArrayList<String>) winners);
+		postStartActivity(intent);
+		
+	}
+
+	@Override
+	public boolean restart(List<String> winners) throws RemoteException
+	{
+		Intent intent = new Intent(mContext, WinnerRestartScreen.class);
+		intent.putStringArrayListExtra("winners", (ArrayList<String>) winners);
+		postStartActivity(intent);
+		return getStartGame();
+	}
+
+
+	
 }

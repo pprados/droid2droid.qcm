@@ -7,4 +7,6 @@ interface RemoteQCM
 	List<String> play(int question, long startTime);	
 	void exit();
 	void startAndStopResultScreen(String winner,String player, int score, boolean manage);
+	void displayWinner(in List<String> winners);
+	boolean restart(in List<String> winners);
 }

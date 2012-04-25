@@ -10,10 +10,6 @@ import org.remoteandroid.apps.qcm.services.AbstractGameScreen;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ProgressBar;
