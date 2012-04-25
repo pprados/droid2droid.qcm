@@ -56,13 +56,14 @@ public class QCMMasterService extends Service
 	private Mode mState = Mode.STOP;
 	private boolean gameStart = false;
 	private RemoteQCM master = null;
+	private int badQuestion = 0;
 	String winner = null;
 	private static Object	sLock		= new Object();
 	private enum Mode 
 	{
 		CONNECT, PLAY, WAIT, STOP,
 	}
-
+	Question question = null;
 	@Override
 	public void onCreate()
 	{
@@ -172,13 +173,13 @@ public class QCMMasterService extends Service
 								player.setNickname(nickname);
 								managePlayer();
 //								int number = mPlayersNumbers.get();
-								master=remotePlayer;
+								setMaster(remotePlayer);
 								if(remotePlayer.starPlayRequest(mPlayersNumbers.incrementAndGet()))
 								{
 									startGame();
 								}
 								else
-									master=null;
+									setMaster(null);
 								player.setNickname(nickname);
 							}
 						}
@@ -229,7 +230,18 @@ public class QCMMasterService extends Service
 			//Get a parser of question 
 			final XMLParser parser = new XMLParser(this);
 			//Atomic integer of number of player who have fail to th question 
-			final AtomicInteger badQuestion = new AtomicInteger(0);
+//			final AtomicInteger badQuestion1 = new AtomicInteger(0);
+			setBadQuestion(0);
+			try
+			{
+				question = parser.getQuestion(questionNumber);
+			} catch (XmlPullParserException e)
+			{
+				e.printStackTrace();
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 			for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 			{
 				final Player player = i.next();
@@ -242,11 +254,11 @@ public class QCMMasterService extends Service
 						try
 						{
 							ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMMasterService.TIME);
-							if(results==null)
-								badQuestion.incrementAndGet();
-							else
+							if(results==null || results.size()==0)
+								badQuestionIncrement();
+//								badQuestion1.incrementAndGet();
+							else if(question!=null)
 							{
-								Question question = parser.getQuestion(questionNumber);
 								if(XMLParser.SINGLE.equals(question.getType()))
 								{
 									SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
@@ -259,7 +271,8 @@ public class QCMMasterService extends Service
 										restart();
 									}
 									else
-										badQuestion.incrementAndGet();
+										badQuestionIncrement();
+//										badQuestion1.incrementAndGet();
 								}
 								else if(XMLParser.MULTIPLE.equals(question.getType()))
 								{
@@ -273,12 +286,14 @@ public class QCMMasterService extends Service
 										restart();
 									}
 									else 
-										badQuestion.incrementAndGet();
+										badQuestionIncrement();
+//										badQuestion1.incrementAndGet();
 								}							
 							}
-							
+							Log.d("TAG", "Bad question : "+/*badQuestion1.get()*/getBadQuestion());
+							System.out.println("Bad question " + /*badQuestion1.get()*/getBadQuestion());
 							//Checker si tout le monde a répondu faux 
-							if(mPlayers.size() == badQuestion.get())
+							if(mPlayers.size() == getBadQuestion()/*badQuestion1.get()*/)
 							{
 								//Lancer l'ecan qui dit que personne n'a gagné
 								restart();
@@ -290,13 +305,7 @@ public class QCMMasterService extends Service
 							mPlayers.remove(i);
 							managePlayer();
 							e.printStackTrace();
-						} catch (XmlPullParserException e)
-						{
-							e.printStackTrace();
-						} catch (IOException e)
-						{
-							e.printStackTrace();
-						}
+						} 
 						
 					}
 				}).start();
@@ -507,6 +516,31 @@ public class QCMMasterService extends Service
 		this.winner = winner;
 	}
 	
+	public synchronized RemoteQCM getMaster()
+	{
+		return master;
+	}
+
+	public synchronized void setMaster(RemoteQCM master)
+	{
+		this.master = master;
+	}
+	
+	
+	public synchronized int getBadQuestion()
+	{
+		return badQuestion;
+	}
+
+	public synchronized void setBadQuestion(int badQuestion)
+	{
+		this.badQuestion = badQuestion;
+	}
+	public synchronized void badQuestionIncrement()
+	{
+		this.badQuestion ++;
+	}
+
 	private void stop()
 	{
 		synchronized (sLock)
@@ -529,15 +563,13 @@ public class QCMMasterService extends Service
 	}
 	private void startAndStopResultScreen(final String winner, final boolean manage)
 	{
-		sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
-		startActivity(new Intent(this, MasterResult.class)
-				.putExtra("winner", winner)
-				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-		//Put other player score here
-			
+		ArrayList<String> nicknames = new ArrayList<String>();
+		ArrayList<Integer> scores = new ArrayList<Integer>();
 		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 		{
 			final Player player = i.next();
+			nicknames.add(player.getNickname());
+			scores.add(player.getScore());
 			new Thread( new Runnable()
 			{
 				@Override
@@ -553,6 +585,19 @@ public class QCMMasterService extends Service
 				}
 			}).start();
 		}
+		if(manage)
+		{
+			sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
+			startActivity(new Intent(this, MasterResult.class)
+			.putExtra("winner", winner)
+			.putStringArrayListExtra("nicknames", nicknames)
+			.putIntegerArrayListExtra("scores", scores)
+			.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+		//Put other player score here
+		}
+			
+		else
+			sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
 	}
 		
 

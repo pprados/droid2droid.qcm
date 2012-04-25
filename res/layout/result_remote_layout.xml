@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-    <LinearLayout android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="4" 
-        android:orientation="horizontal">
-       	<LinearLayout android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical" >
+	    <LinearLayout android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
-	        android:layout_weight="2" >
-        	<ImageView android:id="@+id/winner_image" 
-        	    android:layout_width="fill_parent"
-        	    android:layout_height="fill_parent"/>
-    	</LinearLayout>
-       	<LinearLayout android:layout_width="fill_parent"
+	        android:layout_weight="4" 
+	        android:orientation="horizontal">
+	       	<LinearLayout android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_weight="2" >
+	        	<ImageView android:id="@+id/winner_image" 
+	        	    android:layout_width="fill_parent"
+	        	    android:layout_height="fill_parent"/>
+	    	</LinearLayout>
+	       	<LinearLayout android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_weight="1" >
+	        	<TextView android:id="@+id/winnerName"
+	        	    android:layout_width="fill_parent"
+	        	    android:layout_height="fill_parent"
+	        	    android:gravity="center"
+	        	    style="@style/titleStyle"/>
+	    	</LinearLayout>    	
+	    </LinearLayout>
+	    <LinearLayout android:id="@+id/result_linear_layout" 
+	        android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
-	        android:layout_weight="1" >
-        	<TextView android:id="@+id/winnerName"
-        	    android:layout_width="fill_parent"
-        	    android:layout_height="fill_parent"
-        	    android:gravity="center"
-        	    style="@style/titleStyle"/>
-    	</LinearLayout>    	
-    </LinearLayout>
-    <LinearLayout android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1" 
-        android:orientation="vertical"
-        android:layout_margin="10dip">
-       
-    </LinearLayout>
-    
-
-</LinearLayout>
+	        android:layout_weight="1" 
+	        android:orientation="vertical"
+	        android:layout_margin="10dip">
+	       
+	    </LinearLayout>
+	    
+	
+	</LinearLayout>    
+</ScrollView>

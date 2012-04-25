@@ -2,6 +2,9 @@ package org.remoteandroid.apps.qcm.services;
 
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 public class Player
 {
 	private RemoteQCM player;

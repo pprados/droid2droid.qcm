@@ -109,6 +109,5 @@ public class QuestionActivity extends AbstractGameScreen
 	public void onReceiveForService(Bundle resultData)
 	{
 		finish();
-		
 	}
 }

@@ -45,7 +45,6 @@ public class XMLParser
 			}
 			else if (eventType == XmlPullParser.START_TAG)
 			{
-				System.out.println("Start tag " + model.getName());
 				if(QUESTION.equals(model.getName()) && String.valueOf(questionNumber).equals(model.getAttributeValue(0)) && !rightQuestion)
 				{
 					rightQuestion = true;
@@ -61,13 +60,11 @@ public class XMLParser
 			}
 			else if (eventType == XmlPullParser.END_TAG)
 			{
-				System.out.println("End tag " + model.getName());
 				if(rightQuestion && QUESTION.equals(model.getName()))
 					break;
 			}
 			else if (eventType == XmlPullParser.TEXT)
 			{
-				System.out.println("Text " + model.getText());
 				if(rightQuestion)
 				{
 					if(message==null)
