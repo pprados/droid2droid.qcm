@@ -1,10 +1,10 @@
-package org.remoteandroid.apps.qcm.ui.client;
+package org.remoteandroid.apps.qcm.ui.master;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.remoteandroid.apps.qcm.R;
-import org.remoteandroid.apps.qcm.remote.RemoteQCMImpl;
+import org.remoteandroid.apps.qcm.services.QCMMasterService;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-public class WinnerRestartScreen extends SherlockActivity implements OnClickListener
+public class MasterRestartScreen extends SherlockActivity implements OnClickListener
 {
 	private LinearLayout result_layout;
 	Button submit;
@@ -34,7 +34,6 @@ public class WinnerRestartScreen extends SherlockActivity implements OnClickList
 		{
 			TextView winner = new TextView(getApplicationContext());
 			winner.setText(i.next());
-			
 			result_layout.addView(winner);
 		}
 	}
@@ -43,7 +42,7 @@ public class WinnerRestartScreen extends SherlockActivity implements OnClickList
 	{
 		if(view==submit)
 		{
-			RemoteQCMImpl.postStartGame(true);
+			startService(new Intent(QCMMasterService.REMOTE_START_GAME));
 			finish();
 		}
 		

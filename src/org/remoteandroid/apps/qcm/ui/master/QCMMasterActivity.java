@@ -59,7 +59,7 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	{
 		super.onResume();
 		registerReceiver(mReceiver, new IntentFilter(REGISTER));
-		startService(new Intent(QCMMasterService.REMOTE_START_GAME));
+		startService(new Intent(this,QCMMasterService.class));
 	}
 
 	@Override
@@ -174,4 +174,10 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 		}
 	}
 	
+	@Override
+	public void onBackPressed()
+	{
+		startService(new Intent(QCMMasterService.QUIT));
+		finish();
+	}
 }

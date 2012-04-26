@@ -18,7 +18,7 @@ import org.remoteandroid.apps.qcm.model.Question;
 import org.remoteandroid.apps.qcm.model.SimpleChoiceQuestion;
 import org.remoteandroid.apps.qcm.model.XMLParser;
 import org.remoteandroid.apps.qcm.remote.RemoteQCM;
-import org.remoteandroid.apps.qcm.ui.client.WinnerRestartScreen;
+import org.remoteandroid.apps.qcm.ui.master.MasterRestartScreen;
 import org.remoteandroid.apps.qcm.ui.master.MasterResult;
 import org.remoteandroid.apps.qcm.ui.master.QCMMasterActivity;
 import org.remoteandroid.apps.qcm.ui.master.QuestionActivity;
@@ -41,6 +41,7 @@ public class QCMMasterService extends Service
 	public static final String START_SERVICE = "org.remoteandroid.apps.qcm.START_SERVICE";
 	public static final String SEND_PLAYER_LIST = "org.remoteandroid.apps.qcm.SEND_PLAYER_LIST";
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
+	public static final String QUIT = "org.remoteandroid.apps.qcm.QUIT";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
 //	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
 	public static final int TIME = 60;
@@ -125,14 +126,18 @@ public class QCMMasterService extends Service
 		if(REMOTE_START_GAME.equals(action))
 		{
 			if(master!=null)
-				try
-				{
-					master.leaveMaster();
-				}
-				catch (RemoteException e)
-				{
-					e.printStackTrace();
-				}
+			try
+			{
+				master.leaveMaster();
+			}
+			catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		if(QUIT.equals(action))
+		{
+			stopSelf();
 		}
 		return 0;
 	}
@@ -631,28 +636,28 @@ public class QCMMasterService extends Service
 	{
 		ArrayList<String> winners = new ArrayList<String>();
 		winners = getWinnersInfos();
-		startActivity(new Intent(this, WinnerRestartScreen.class)
+		startActivity(new Intent(this, MasterRestartScreen.class)
 		.putStringArrayListExtra("winners",winners)
 		.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 		{
 			final Player player = i.next();
-			
-				try
+			player.setScore(0);
+			try
+			{
+				if(master==player.getPlayer() && master!=null)
 				{
-					if(master==player.getPlayer() && master!=null)
+					if(player.getPlayer().restart(winners))
 					{
-						if(player.getPlayer().restart(winners))
-						{
-							startGame();
-						}
+						startGame();
 					}
-					else
-						player.getPlayer().displayWinner(winners);
-				} catch (RemoteException e)
-				{
-					e.printStackTrace();
 				}
+				else
+					player.getPlayer().displayWinner(winners);
+			} catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 		
