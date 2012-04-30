@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">QuiZzz</string>
+    <string name="app_name">RA QuiZzz</string>
     <string name="btn_connect">Connect</string>
     <string name="label_status">Status  </string>
     <string name="status_connected">  Connected</string>
