@@ -48,7 +48,7 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 
 	private ListView list;
 	
-	private List<String> players = new ArrayList<String>();
+	private ArrayList<String> players;
 	ArrayAdapter<String> mAdapter;
 	private TextView master_name;
 	private Resources resources;
@@ -59,7 +59,7 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	{
 		super.onResume();
 		registerReceiver(mReceiver, new IntentFilter(REGISTER));
-		startService(new Intent(this,QCMMasterService.class));
+		startService(new Intent(QCMMasterService.SEND_PLAYER_LIST));
 	}
 
 	@Override
@@ -71,6 +71,10 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 		mStartGame = (Button) findViewById(R.id.remote_start);
 		mQrcodeButton.setOnClickListener(this);
 		mStartGame.setOnClickListener(this);
+		if(savedInstanceState!=null)
+			players = savedInstanceState.getStringArrayList("players");
+		else
+			players = new ArrayList<String>();
 		if(players.size()==0)
 			mStartGame.setEnabled(false);
 		else
@@ -179,5 +183,11 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	{
 		startService(new Intent(QCMMasterService.QUIT));
 		finish();
+	}
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		outState.putStringArrayList("players", players);
 	}
 }

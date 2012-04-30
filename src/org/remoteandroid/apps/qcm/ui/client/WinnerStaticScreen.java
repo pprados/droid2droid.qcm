@@ -23,12 +23,13 @@ public class WinnerStaticScreen extends SherlockActivity
 		result_layout = (LinearLayout)findViewById(R.id.winner_layout);
 		Intent intent = getIntent();
 		ArrayList<String> winners = intent.getStringArrayListExtra("winners");
-		for (Iterator<String> i = winners.iterator(); i.hasNext();)
-		{
-			TextView winner = new TextView(getApplicationContext());
-			winner.setText(i.next());
-			result_layout.addView(winner);
-		}
+		if(winners!=null)
+			for (Iterator<String> i = winners.iterator(); i.hasNext();)
+			{
+				TextView winner = new TextView(getApplicationContext());
+				winner.setText(i.next());
+				result_layout.addView(winner);
+			}
 	}
 
 }

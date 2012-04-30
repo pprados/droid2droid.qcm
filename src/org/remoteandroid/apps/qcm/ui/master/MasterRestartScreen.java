@@ -30,12 +30,13 @@ public class MasterRestartScreen extends SherlockActivity implements OnClickList
 		submit.setOnClickListener(this);
 		Intent intent = getIntent();
 		ArrayList<String> winners = intent.getStringArrayListExtra("winners");
-		for (Iterator<String> i = winners.iterator(); i.hasNext();)
-		{
-			TextView winner = new TextView(getApplicationContext());
-			winner.setText(i.next());
-			result_layout.addView(winner);
-		}
+		if(winners!=null)
+			for (Iterator<String> i = winners.iterator(); i.hasNext();)
+			{
+				TextView winner = new TextView(getApplicationContext());
+				winner.setText(i.next());
+				result_layout.addView(winner);
+			}
 	}
 	@Override
 	public void onClick(View view)

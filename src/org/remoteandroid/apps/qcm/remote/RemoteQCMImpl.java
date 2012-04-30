@@ -3,6 +3,7 @@ package org.remoteandroid.apps.qcm.remote;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.remoteandroid.apps.qcm.services.QCMMasterService;
 import org.remoteandroid.apps.qcm.ui.client.AnswerActivity;
 import org.remoteandroid.apps.qcm.ui.client.ClientResult;
 import org.remoteandroid.apps.qcm.ui.client.ClientStartGame;
@@ -132,7 +133,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 		{
 			try
 			{
-				sLock.wait();
+				sLock.wait(QCMMasterService.TIME*1000L+200);
 				return results;
 			}
 			catch (InterruptedException e)

@@ -44,7 +44,7 @@ public class QCMMasterService extends Service
 	public static final String QUIT = "org.remoteandroid.apps.qcm.QUIT";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
 //	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
-	public static final int TIME = 60;
+	public static final int TIME = 20;
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMMasterService sMe;
 
@@ -180,14 +180,14 @@ public class QCMMasterService extends Service
 								player.setNickname(nickname);
 								managePlayer();
 //								int number = mPlayersNumbers.get();
-								
+								if(master==null)
+									setMaster(remotePlayer);
 								if(remotePlayer.starPlayRequest(mPlayersNumbers.incrementAndGet()))
 								{
-									setMaster(remotePlayer);
 									startGame();
 								}
-								else
-									setMaster(null);
+//								else
+//									setMaster(null);
 								player.setNickname(nickname);
 							}
 						}
@@ -459,7 +459,7 @@ public class QCMMasterService extends Service
 				}
 				
 			}
-		}, 0);
+		}, RemoteAndroidManager.FLAG_PROPOSE_PAIRING);
 		if(block)
 		{
 			synchronized (this)
@@ -626,7 +626,7 @@ public class QCMMasterService extends Service
 				players.clear();
 				players.add(player.getNickname());
 			}
-			else if(score==max_score)
+			else if(score==max_score && max_score!=0)
 				players.add(player.getNickname());
 			
 		}
@@ -647,7 +647,7 @@ public class QCMMasterService extends Service
 			{
 				if(master==player.getPlayer() && master!=null)
 				{
-					if(player.getPlayer().restart(winners))
+					if(master.restart(winners))
 					{
 						startGame();
 					}
