@@ -106,7 +106,6 @@ public class QCMMasterService extends Service
 			@Override
 			public void bind(RemoteAndroidManager manager)
 			{
-				// TODO Auto-generated method stub
 				mManager=manager;
 								
 			}
@@ -358,8 +357,7 @@ public class QCMMasterService extends Service
 			public void onServiceDisconnected(ComponentName name)
 			{
 				mPlayers.remove(uri);
-				managePlayer(); //FIXME Null pointer exception on disconnect
-				//TODO Send broadcast to remove on the liste
+				managePlayer();
 				mPlayersNumbers.decrementAndGet();
 				mAndroids.remove(info);
 				if(block)
