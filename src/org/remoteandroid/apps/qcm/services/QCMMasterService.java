@@ -43,7 +43,6 @@ public class QCMMasterService extends Service
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public static final String QUIT = "org.remoteandroid.apps.qcm.QUIT";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
-//	public Map<String, String> mPlayersNickname = Collections.synchronizedMap(new HashMap<String, String>());
 	public static final int TIME = 20;
 	ListRemoteAndroidInfo mAndroids;
 	public static QCMMasterService sMe;
@@ -136,7 +135,7 @@ public class QCMMasterService extends Service
 		}
 		if(QUIT.equals(action))
 		{
-			stopSelf();
+			stopService();
 		}
 		return 0;
 	}
@@ -175,19 +174,15 @@ public class QCMMasterService extends Service
 							String nickname = remotePlayer.subscribe();
 							if(nickname!=null)
 							{
-//								mPlayersNickname.put(uri, nickname);
 								player.setNickname(nickname);
 								managePlayer();
-//								int number = mPlayersNumbers.get();
 								if(master==null)
 									setMaster(remotePlayer);
 								if(remotePlayer.starPlayRequest(mPlayersNumbers.incrementAndGet()))
 								{
 									startGame();
 								}
-//								else
-//									setMaster(null);
-								player.setNickname(nickname);
+//								player.setNickname(nickname);
 							}
 						}
 						catch (RemoteException e)
@@ -229,6 +224,11 @@ public class QCMMasterService extends Service
 		Collections.shuffle(questionList);
 		for(int num = 1; num<= XMLParser.MAX_QUESTION; num++ )
 		{
+			if(mPlayers.size()==0)
+			{
+				break;
+			}
+				
 			final int questionNumber = questionList.get(num);
 			Intent intent = new Intent(this, QuestionActivity.class);
 			intent.putExtra("questionNumber", questionNumber); 
@@ -260,48 +260,66 @@ public class QCMMasterService extends Service
 						try
 						{
 							ArrayList<String> results = (ArrayList<String>) player.getPlayer().play(questionNumber, QCMMasterService.TIME);
-							if(results==null || results.size()==0)
-								badQuestionIncrement();
-//								badQuestion1.incrementAndGet();
-							else if(question!=null)
+							if(results!=null)
 							{
-								if(XMLParser.SINGLE.equals(question.getType()))
+								if(results.size()==0)
+									badQuestionIncrement();
+//									badQuestion1.incrementAndGet();
+								else if(question!=null)
 								{
-									SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
-									if(sQuestion.getAnswer().equals(results.get(0)) && winner == null)
+									if(XMLParser.SINGLE.equals(question.getType()))
 									{
-										setWinner(player.getNickname());
-										player.incrementScore();
-										//TODO Annuler tout le choix chez tous les autres
-										Log.d("TAG", "Simple Choice good question");
-										restart();
+										SimpleChoiceQuestion sQuestion = (SimpleChoiceQuestion) question;
+										if(sQuestion.getAnswer().equals(results.get(0)) && winner == null)
+										{
+											setWinner(player.getNickname());
+											player.incrementScore();
+											//TODO Annuler tout le choix chez tous les autres
+											Log.d("TAG", "Simple Choice good question");
+											restart();
+										}
+										else
+											badQuestionIncrement();
+//											badQuestion1.incrementAndGet();
 									}
-									else
-										badQuestionIncrement();
-//										badQuestion1.incrementAndGet();
-								}
-								else if(XMLParser.MULTIPLE.equals(question.getType()))
-								{
-									MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
-									if(mQuestion.getAnswers().equals(results) && winner == null)
+									else if(XMLParser.MULTIPLE.equals(question.getType()))
 									{
-										setWinner(player.getNickname());
-										player.incrementScore();
-										//TODO Annuler tout le choix chez tous les autres
-										Log.d("TAG", "Multiple Choice good question");
-										restart();
-									}
-									else 
-										badQuestionIncrement();
-//										badQuestion1.incrementAndGet();
-								}							
+										MultipleChoicesQuestion mQuestion = (MultipleChoicesQuestion) question;
+										if(mQuestion.getAnswers().equals(results) && winner == null)
+										{
+											setWinner(player.getNickname());
+											player.incrementScore();
+											//TODO Annuler tout le choix chez tous les autres
+											Log.d("TAG", "Multiple Choice good question");
+											restart();
+										}
+										else 
+											badQuestionIncrement();
+//											badQuestion1.incrementAndGet();
+									}							
+								}								
 							}
-							Log.d("TAG", "Bad question : "+/*badQuestion1.get()*/getBadQuestion());
-							System.out.println("Bad question " + /*badQuestion1.get()*/getBadQuestion());
+							else
+							{
+								removePlayer(player);
+								if(mPlayers.size()==0)
+									mState = Mode.STOP;
+								if(mPlayers.size()>0)
+								{
+									if(player.getPlayer()==master)
+									for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
+									{
+										final Player player = i.next();
+										if(player.getPlayer()!=null)
+											setMaster(player.getPlayer());
+										return;
+									}
+								}
+							}
+
 							//Checker si tout le monde a rŽpondu faux 
 							if(mPlayers.size() == getBadQuestion()/*badQuestion1.get()*/)
 							{
-								//Lancer l'ecan qui dit que personne n'a gagnŽ
 								restart();
 							}
 								
@@ -358,7 +376,8 @@ public class QCMMasterService extends Service
 			{
 				mPlayers.remove(uri);
 				managePlayer();
-				mPlayersNumbers.decrementAndGet();
+				if(mPlayersNumbers.get()>0)
+					mPlayersNumbers.decrementAndGet();
 				mAndroids.remove(info);
 				if(block)
 				{
@@ -367,6 +386,7 @@ public class QCMMasterService extends Service
 						QCMMasterService.this.notify();
 					}
 				}
+//				Toast.makeText(getApplicationContext(), "Verify that you've shared your device in Remote Android parameters and you're in the same network ", Toast.LENGTH_LONG).show();
 			}
 			
 			@Override
@@ -374,6 +394,9 @@ public class QCMMasterService extends Service
 			{
 				final RemoteAndroid rA = (RemoteAndroid)service;
 				rA.setExecuteTimeout(60*60000L);
+				final Player player = new Player();
+				player.setRemoteAndroid(rA);
+				player.setUri(uri);
 				try
 				{
 					rA.pushMe(getApplicationContext(), new PublishListener()
@@ -413,7 +436,6 @@ public class QCMMasterService extends Service
 									public void onServiceConnected(ComponentName name, IBinder service)
 									{
 										remotePlayer = RemoteQCM.Stub.asInterface(service);
-										Player player = new Player();
 										player.setPlayer(remotePlayer);
 										mPlayers.put(uri, player);
 										if(block)
@@ -482,39 +504,121 @@ public class QCMMasterService extends Service
 	{
 		return null;
 	}
-
+//
+//	@Override
+//	public void onDestroy()
+//	{
+//		super.onDestroy();
+//		Log.d("service","Service onDestroy");
+//		for (final Player i:mPlayers.values())
+//		{
+//			new AsyncTask<Void, Void, Void>()
+//			{
+//				@Override
+//				protected Void doInBackground(Void... params)
+//				{
+//					try
+//					{
+//						i.getPlayer().exit();
+//					}
+//					catch (RemoteException e)
+//					{
+//						// Ignore
+//					}
+//					return null;
+//				}
+//			}.execute();
+//		}
+//		if (mAndroids != null)
+//		{
+//			mAndroids.close();
+//		}
+//		mManager.close();
+//		sMe=null;
+//		mPlayers = null;
+//	}
+	
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
 		Log.d("service","Service onDestroy");
-		for (final Player i:mPlayers.values())
+		stopService();
+	}
+	private synchronized void stopService()
+	{
+		if (sMe==null)
+			return;
+		sMe=null;
+		mAndroids.close();
+		new Thread(new Runnable()
 		{
-			new AsyncTask<Void, Void, Void>()
+			@Override
+			public void run()
 			{
-				@Override
-				protected Void doInBackground(Void... params)
+				stopSyncService();
+			}
+		}).start();
+		stopSelf();
+	}
+
+	private void stopSyncService()
+	{
+		if(mPlayers!=null)
+		{
+			for (final Player i:mPlayers.values())
+			{
+				new AsyncTask<Void, Void, Void>()
 				{
-					try
+					@Override
+					protected Void doInBackground(Void... params)
 					{
-						i.getPlayer().exit();
+						RemoteAndroid ra = i.getRemoteAndroid();
+						if(ra!=null)
+							ra.close();
+						try
+						{
+							i.getPlayer().exit();
+						}
+						catch (RemoteException e)
+						{
+							// Ignore
+						}
+						return null;
 					}
-					catch (RemoteException e)
-					{
-						// Ignore
-					}
-					return null;
-				}
-			}.execute();
+				}.execute();
+			}
+			mPlayers.clear();
 		}
+
 		if (mAndroids != null)
 		{
 			mAndroids.close();
 		}
-		mManager.close();
+		if (mManager!=null)
+			mManager.close();
 		sMe=null;
-		mPlayers = null;
 	}
+	
+	public void removePlayer(Player player)
+	{
+		if(player.getPlayer()!=null)
+			try
+			{
+				player.getPlayer().exit();
+			} catch (RemoteException e)
+			{
+				//ignore
+			}
+		if(player.getRemoteAndroid()!=null)
+			player.getRemoteAndroid().close();
+		if(player.getUri()!=null)
+			mPlayers.remove(player.getUri());
+		if(mPlayers.size()==0)
+			sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
+		
+	}
+
 	
 	public synchronized String getWinner()
 	{
@@ -608,6 +712,12 @@ public class QCMMasterService extends Service
 			
 		else
 			sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
+		if(mPlayers.size()==0)
+		{
+			sendBroadcast(new Intent(MasterResult.FINISH_ACTIVITY));
+			mState = Mode.STOP;
+		}
+			
 	}
 	
 	public ArrayList<String> getWinnersInfos()
@@ -634,29 +744,34 @@ public class QCMMasterService extends Service
 	{
 		ArrayList<String> winners = new ArrayList<String>();
 		winners = getWinnersInfos();
-		startActivity(new Intent(this, MasterRestartScreen.class)
-		.putStringArrayListExtra("winners",winners)
-		.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-		for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
+		if(mPlayers.size()>0)
 		{
-			final Player player = i.next();
-			player.setScore(0);
-			try
+			startActivity(new Intent(this, MasterRestartScreen.class)
+			.putStringArrayListExtra("winners",winners)
+			.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+			for(final Iterator<Player> i = mPlayers.values().iterator(); i.hasNext();)
 			{
-				if(master==player.getPlayer() && master!=null)
+				final Player player = i.next();
+				player.setScore(0);
+				try
 				{
-					if(master.restart(winners))
+					if(master==player.getPlayer() && master!=null)
 					{
-						startGame();
+						if(master.restart(winners))
+						{
+							startGame();
+							sendBroadcast(new Intent(AbstractGameScreen.FINISH_ACTIVITY));
+						}
 					}
+					else
+						player.getPlayer().displayWinner(winners);
+				} catch (RemoteException e)
+				{
+					e.printStackTrace();
 				}
-				else
-					player.getPlayer().displayWinner(winners);
-			} catch (RemoteException e)
-			{
-				e.printStackTrace();
 			}
 		}
+
 	}
 		
 

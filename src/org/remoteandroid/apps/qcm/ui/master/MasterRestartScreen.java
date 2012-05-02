@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.remoteandroid.apps.qcm.R;
+import org.remoteandroid.apps.qcm.services.AbstractGameScreen;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
 
 import android.content.Intent;
@@ -16,7 +17,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-public class MasterRestartScreen extends SherlockActivity implements OnClickListener
+public class MasterRestartScreen extends AbstractGameScreen implements OnClickListener
 {
 	private LinearLayout result_layout;
 	Button submit;
@@ -37,6 +38,8 @@ public class MasterRestartScreen extends SherlockActivity implements OnClickList
 				winner.setText(i.next());
 				result_layout.addView(winner);
 			}
+		else if(winners.size()==0)
+			finish();
 	}
 	@Override
 	public void onClick(View view)
@@ -46,6 +49,12 @@ public class MasterRestartScreen extends SherlockActivity implements OnClickList
 			startService(new Intent(QCMMasterService.REMOTE_START_GAME));
 			finish();
 		}
+		
+	}
+	@Override
+	public void onReceiveForService(Bundle resultData)
+	{
+		finish();
 		
 	}
 

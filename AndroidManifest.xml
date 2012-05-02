@@ -103,8 +103,6 @@
                 <action android:name="org.remoteandroid.apps.QCM.RemoteService" />
             </intent-filter>
         </service>
-        <service android:name=".services.QCMClientService" >
-        </service>
     </application>
 
 </manifest>

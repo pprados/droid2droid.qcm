@@ -14,10 +14,6 @@ public class WaitingActivity extends AbstractGameScreen
 		setContentView(R.layout.waiting_layout);
 	}
 	@Override
-	public void onBackPressed()
-	{
-	}
-	@Override
 	public void onReceiveForService(Bundle resultData)
 	{
 		// TODO Auto-generated method stub

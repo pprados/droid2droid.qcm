@@ -3,11 +3,12 @@ package org.remoteandroid.apps.qcm.ui.master;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
+import org.remoteandroid.RemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
+import org.remoteandroid.apps.qcm.tools.NfcSherlockActivity;
 
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -27,9 +28,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-
-public class QCMMasterActivity extends SherlockActivity implements OnClickListener
+public class QCMMasterActivity extends NfcSherlockActivity implements OnClickListener
 {
 	public static final String REGISTER = "org.remoteandroid.apps.qcm.REGISTER";
 	public static final boolean ADD_PLAYER = true;
@@ -189,5 +188,12 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 	{
 		super.onSaveInstanceState(outState);
 		outState.putStringArrayList("players", players);
+	}
+
+	@Override
+	public void onNfcDiscover(RemoteAndroidInfo info)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

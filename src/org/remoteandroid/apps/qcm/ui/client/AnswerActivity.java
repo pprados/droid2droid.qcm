@@ -42,7 +42,10 @@ public class AnswerActivity extends AbstractGameScreen implements OnClickListene
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		startTime = System.currentTimeMillis();
+		if(savedInstanceState==null)
+			startTime = System.currentTimeMillis();
+		else
+			startTime = savedInstanceState.getLong("startTime");
 		setContentView(R.layout.answer_layout);
 		mTimeBar = (ProgressBar) findViewById(R.id.timeBar);
 		answerView = (LinearLayout)findViewById(R.id.answerView);
@@ -129,7 +132,7 @@ public class AnswerActivity extends AbstractGameScreen implements OnClickListene
 
 			protected void onPostExecute(Void result)
 			{
-				RemoteQCMImpl.postResults(null);
+				RemoteQCMImpl.postResults(new ArrayList<String>(0));
 				finish();
 			};
 		}.execute();
@@ -167,12 +170,25 @@ public class AnswerActivity extends AbstractGameScreen implements OnClickListene
 		}
 		
 	}
+	
+	@Override
+	public void onBackPressed()
+	{
+		RemoteQCMImpl.postResults(null);
+		finish();
+	}
 
 	@Override
 	public void onReceiveForService(Bundle resultData)
 	{
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		outState.putLong("startTime", startTime);
 	}
 	
 }
