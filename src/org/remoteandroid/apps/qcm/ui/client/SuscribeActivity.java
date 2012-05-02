@@ -30,6 +30,13 @@ public class SuscribeActivity extends SherlockActivity implements OnClickListene
 		playButton.setOnClickListener(this);
 		nickname = (EditText)findViewById(R.id.edt_pseudo);
 	}
+	
+	@Override
+		public void onBackPressed()
+		{
+			super.onBackPressed();
+			RemoteQCMImpl.postNickname(null);
+		}
 	@Override
 	public void onClick(View v)
 	{
@@ -76,7 +83,6 @@ public class SuscribeActivity extends SherlockActivity implements OnClickListene
 		}
 		
 	}
-	
 	
 	
 }

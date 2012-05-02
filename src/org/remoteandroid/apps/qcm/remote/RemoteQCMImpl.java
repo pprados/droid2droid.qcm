@@ -46,7 +46,7 @@ public class RemoteQCMImpl extends RemoteQCM.Stub
 			@Override
 			public void run()
 			{
-				mContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_NEW_TASK));
+				mContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP/*|Intent.FLAG_ACTIVITY_CLEAR_TASK*/|Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_NEW_TASK));
 			}
 		});
 	}

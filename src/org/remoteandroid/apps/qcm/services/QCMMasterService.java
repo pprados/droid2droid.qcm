@@ -191,6 +191,10 @@ public class QCMMasterService extends Service
 								}
 //								player.setNickname(nickname);
 							}
+							else 
+							{
+								removePlayer(player);
+							}
 						}
 						catch (RemoteException e)
 						{
@@ -437,6 +441,7 @@ public class QCMMasterService extends Service
 									public void onServiceDisconnected(ComponentName name)
 									{
 										remotePlayer=null;
+										removePlayer(player);
 										
 									}
 									
