@@ -42,6 +42,7 @@ public class QCMMasterService extends Service
 	public static final String SEND_PLAYER_LIST = "org.remoteandroid.apps.qcm.SEND_PLAYER_LIST";
 	public static final String REMOTE_START_GAME = "org.remoteandroid.apps.qcm.REMOTE_START_GAME";
 	public static final String QUIT = "org.remoteandroid.apps.qcm.QUIT";
+	public static final String ADD_DEVICE_BY_NFC = "org.remoteandroid.apps.qcm.ADD_DEVICE_BY_NFC";
 	public Map<String, Player> mPlayers = Collections.synchronizedMap(new HashMap<String, Player>());
 	public static final int TIME = 20;
 	ListRemoteAndroidInfo mAndroids;
@@ -137,6 +138,12 @@ public class QCMMasterService extends Service
 		{
 			stopService();
 		}
+		if(ADD_DEVICE_BY_NFC.equals(action))
+		{
+			RemoteAndroidInfo info = intent.getParcelableExtra("info");
+			if(info!=null)
+				onDiscover(info, false);
+		}
 		return 0;
 	}
 
@@ -216,6 +223,7 @@ public class QCMMasterService extends Service
 	public void startGame()
 	{
 		mState = Mode.PLAY;
+		sendBroadcast(new Intent(AbstractGameScreen.FINISH_ACTIVITY));
 		//Put the type of question
 		ArrayList<Integer> questionList = new ArrayList<Integer>();
 		for(int i= 1 ; i<= XMLParser.TOTAL_NUMBER_OF_QUESTION; i++)
@@ -759,8 +767,8 @@ public class QCMMasterService extends Service
 					{
 						if(master.restart(winners))
 						{
-							startGame();
 							sendBroadcast(new Intent(AbstractGameScreen.FINISH_ACTIVITY));
+							startGame();
 						}
 					}
 					else

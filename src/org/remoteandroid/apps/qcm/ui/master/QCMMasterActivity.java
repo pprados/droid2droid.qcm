@@ -193,7 +193,9 @@ public class QCMMasterActivity extends NfcSherlockActivity implements OnClickLis
 	@Override
 	public void onNfcDiscover(RemoteAndroidInfo info)
 	{
-		// TODO Auto-generated method stub
+		Intent intent = new Intent(QCMMasterService.ADD_DEVICE_BY_NFC);
+		intent.putExtra("info", info);
+		startService(intent);
 		
 	}
 }
