@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import org.remoteandroid.RemoteAndroidInfo;
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
-import org.remoteandroid.apps.qcm.tools.NfcSherlockActivity;
 
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -28,7 +26,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class QCMMasterActivity extends NfcSherlockActivity implements OnClickListener
+import com.actionbarsherlock.app.SherlockActivity;
+
+public class QCMMasterActivity extends SherlockActivity implements OnClickListener
 {
 	public static final String REGISTER = "org.remoteandroid.apps.qcm.REGISTER";
 	public static final boolean ADD_PLAYER = true;
@@ -96,8 +96,9 @@ public class QCMMasterActivity extends NfcSherlockActivity implements OnClickLis
 		unregisterReceiver(mReceiver);
 	}
 
-	private BroadcastReceiver mReceiver = new BroadcastReceiver()
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver()
 	{
+		@Override
 		public void onReceive(android.content.Context context, android.content.Intent intent)
 		{
 			players.clear();
@@ -190,12 +191,12 @@ public class QCMMasterActivity extends NfcSherlockActivity implements OnClickLis
 		outState.putStringArrayList("players", players);
 	}
 
-	@Override
-	public void onNfcDiscover(RemoteAndroidInfo info)
-	{
-		Intent intent = new Intent(QCMMasterService.ADD_DEVICE_BY_NFC);
-		intent.putExtra("info", info);
-		startService(intent);
-		
-	}
+//	@Override
+//	public void onNfcDiscover(RemoteAndroidInfo info)
+//	{
+//		Intent intent = new Intent(QCMMasterService.ADD_DEVICE_BY_NFC);
+//		intent.putExtra("info", info);
+//		startService(intent);
+//		
+//	}
 }

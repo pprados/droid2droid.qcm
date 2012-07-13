@@ -53,7 +53,7 @@ public class QCMMasterService extends Service
 	public static final String TAG = "QCM Service";
 
 //	public static final String ACTION_SUSCRIBE = "org.remoteandroid.apps.qcm.SUSCRIBE_TO_REMOTE";
-	private AtomicInteger mPlayersNumbers = new AtomicInteger(0);
+	private final AtomicInteger mPlayersNumbers = new AtomicInteger(0);
 
 	private Mode mState = Mode.STOP;
 //	private boolean gameStart = false;
@@ -155,8 +155,8 @@ public class QCMMasterService extends Service
 		// but i must ignore it now. I will manage in the onResult.
 		mAndroids.remove(remoteAndroidInfo);
 		mAndroids.add(remoteAndroidInfo);
-		if (replace)
-			return; // TODO Optimise la connexion
+		if (mState != Mode.STOP && replace)
+			return;
 		if(mState == Mode.STOP)
 			startConnection(remoteAndroidInfo);
 
@@ -329,7 +329,7 @@ public class QCMMasterService extends Service
 								}
 							}
 
-							//Checker si tout le monde a rŽpondu faux 
+							//Checker si tout le monde a rï¿½pondu faux 
 							if(mPlayers.size() == getBadQuestion()/*badQuestion1.get()*/)
 							{
 								restart();
@@ -492,7 +492,7 @@ public class QCMMasterService extends Service
 				}
 				
 			}
-		}, RemoteAndroidManager.FLAG_PROPOSE_PAIRING);
+		}, RemoteAndroidManager.FLAG_ACCEPT_ANONYMOUS|RemoteAndroidManager.FLAG_PROPOSE_PAIRING);
 		if(block)
 		{
 			synchronized (this)
