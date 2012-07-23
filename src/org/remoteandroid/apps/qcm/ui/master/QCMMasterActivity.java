@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import org.remoteandroid.RemoteAndroidManager;
 import org.remoteandroid.apps.qcm.R;
 import org.remoteandroid.apps.qcm.services.QCMMasterService;
+import org.remoteandroid.apps.qcm.tools.NfcSherlockActivity;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -15,6 +17,8 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.nfc.NdefMessage;
+import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -26,9 +30,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-
-public class QCMMasterActivity extends SherlockActivity implements OnClickListener
+public class QCMMasterActivity extends NfcSherlockActivity implements OnClickListener
 {
 	public static final String REGISTER = "org.remoteandroid.apps.qcm.REGISTER";
 	public static final boolean ADD_PLAYER = true;
@@ -117,6 +119,7 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 		};
 	};
 
+	@TargetApi(11)
 	private Bitmap getOwnQRCodeFromRA(final int size)
 	{
 		Bitmap scaBitmap = null;
@@ -191,12 +194,10 @@ public class QCMMasterActivity extends SherlockActivity implements OnClickListen
 		outState.putStringArrayList("players", players);
 	}
 
-//	@Override
-//	public void onNfcDiscover(RemoteAndroidInfo info)
-//	{
-//		Intent intent = new Intent(QCMMasterService.ADD_DEVICE_BY_NFC);
-//		intent.putExtra("info", info);
-//		startService(intent);
-//		
-//	}
+	@Override
+	@TargetApi(14)
+	public NdefMessage createNdefMessage(NfcEvent event)
+	{
+		return (QCMMasterService.mManager!=null) ? QCMMasterService.mManager.createNdefMessage() : null;
+	}
 }

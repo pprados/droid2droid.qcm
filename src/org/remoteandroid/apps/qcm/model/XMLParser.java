@@ -19,7 +19,7 @@ public class XMLParser
 	public static final String MULTIPLE = "check";
 	public static final String QUESTION="question";
 	public static final String VALUE="value";
-	private XmlResourceParser model;
+	private final XmlResourceParser model;
 	
 	public XMLParser(Context context)
 	{
