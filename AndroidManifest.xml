@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.remoteandroid.apps.qcm"
+    package="org.droid2droid.apps.qcm"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -8,21 +8,14 @@
         android:minSdkVersion="4"
         android:targetSdkVersion="14" />
 
-    <permission
-        android:name="org.remoteandroid.permission.DISCOVER"
-        android:description="@string/permission_discover_desc"
-        android:label="@string/permission_discover_label"
-        android:permissionGroup="android.permission-group.NETWORK"
-        android:protectionLevel="normal" />
-
     <!-- For receive discover events -->
-    <uses-permission android:name="org.remoteandroid.permission.discover.RECEIVE" />
+    <uses-permission android:name="org.droid2droid.permission.discover.RECEIVE" />
+    <uses-permission android:name="org.droid2droid.permission.contentprovider.QRCODE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="org.remoteandroid.permission.contentprovider.QRCODE" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -93,14 +86,14 @@
         
         <service android:name=".services.QCMMasterService" >
             <intent-filter>
-                <action android:name="org.remoteandroid.apps.qcm.START_SERVICE" />
-                <action android:name="org.remoteandroid.apps.qcm.REMOTE_START_GAME" />
-                <action android:name="org.remoteandroid.apps.qcm.SEND_PLAYER_LIST"/>
+                <action android:name="org.droid2droid.apps.qcm.START_SERVICE" />
+                <action android:name="org.droid2droid.apps.qcm.REMOTE_START_GAME" />
+                <action android:name="org.droid2droid.apps.qcm.SEND_PLAYER_LIST"/>
             </intent-filter>
         </service>
         <service android:name=".remote.RemoteQCMService" >
             <intent-filter>
-                <action android:name="org.remoteandroid.apps.QCM.RemoteService" />
+                <action android:name="org.droid2droid.apps.QCM.RemoteService" />
             </intent-filter>
         </service>
     </application>
